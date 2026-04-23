@@ -1254,6 +1254,7 @@ function renderMenuEditor() {
             ${p.image ? `<img src="${p.image}" alt="">` : '<div style="width:42px;height:42px;border-radius:6px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#d9cbb5;font-size:18px;">☕</div>'}
             <div class="ename">${escapeHtml(getName(p))}</div>
             <div class="eprice">${fmt(p.price)}</div>
+            <button class="toggle-avail ${p.available === false ? 'off' : ''}" onclick="toggleAvailable('${p.id}')">${p.available === false ? 'Sold Out' : 'In stock'}</button>
             <button class="icon-btn" onclick="openProductEditor('${p.id}')">✎</button>
             <button class="icon-btn del" onclick="deleteProduct('${p.id}')">🗑</button>
           </div>`).join("")}
