@@ -957,6 +957,7 @@ function renderProducts() {
 function addToCart(productId) {
   const p = products.find(x => x.id === productId);
   if (!p) return;
+  if (p.available === false) { toast("Item is sold out"); return; }
   cart.push({ lineId: uid(), productId: p.id, name: getName(p), cat: p.cat, price: p.price, qty: 1, addons: [] });
   renderCart();
 }
