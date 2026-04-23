@@ -1242,6 +1242,14 @@ function printReport() {
 }
 
 // ========== MENU EDITOR ==========
+ function toggleAvailable(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  p.available = (p.available === false) ? true : false;
+  saveMenu();
+  renderMenuEditor();
+  renderProducts();
+}
 function renderMenuEditor() {
   const grouped = {}; categories.forEach(c => grouped[c.id] = []);
   products.forEach(p => { if (!grouped[p.cat]) grouped[p.cat] = []; grouped[p.cat].push(p); });
