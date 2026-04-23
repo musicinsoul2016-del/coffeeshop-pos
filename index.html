@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>"Chang Moo Coffee",</title>
+<title>Chang Moo Coffee POS</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Thai", "Noto Sans SC", Roboto, sans-serif; background: #f3ede3; color: #2b2018; user-select: none; -webkit-user-select: none; }
@@ -153,6 +153,21 @@
     .brand { font-size: 15px; }
     .tab { padding: 8px 10px; font-size: 13px; }
   }
+
+  /* Sold-out / availability */
+  .product { position: relative; }
+  .product.unavailable { opacity: 0.55; background: #f3ede3; }
+  .product.unavailable:active { transform: none; background: #f3ede3; }
+  .sold-out-badge {
+    display: inline-block; margin-top: 4px; padding: 2px 8px;
+    background: #b54a3a; color: #fff; font-size: 11px; font-weight: 700;
+    border-radius: 10px; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .toggle-avail {
+    width: 32px; height: 32px; border-radius: 6px; background: #fff;
+    font-size: 14px; flex-shrink: 0; border: 1px solid #4a7c59; color: #4a7c59;
+  }
+  .toggle-avail.off { border-color: #b54a3a; color: #b54a3a; background: #fff4f1; }
 </style>
 </head>
 <body>
@@ -372,238 +387,11 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- Live customer orders badge + panel (from QR menu) -->
-<div id="liveOrdersBadge" style="display:none;position:fixed;top:70px;right:16px;background:#b54a3a;color:#fff;padding:8px 14px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;z-index:900;box-shadow:0 4px 12px rgba(0,0,0,0.2);" onclick="openLiveOrders()">
-  🔔 <span id="liveOrdersCount">0</span> <span data-i18n="new_customer_orders">new orders</span>
-</div>
-<div id="liveOrdersModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:950;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:#fff;width:100%;max-width:560px;max-height:85vh;border-radius:14px;display:flex;flex-direction:column;overflow:hidden;">
-    <div style="padding:14px 18px;border-bottom:1px solid #e8dfd0;display:flex;justify-content:space-between;align-items:center;">
-      <h2 style="font-size:17px;" data-i18n="customer_orders">Customer Orders</h2>
-      <button onclick="closeLiveOrders()" style="background:#f3ede3;width:34px;height:34px;border-radius:17px;font-size:20px;">×</button>
-    </div>
-    <div id="liveOrdersList" style="padding:12px 18px;overflow-y:auto;flex:1;"></div>
-  </div>
-</div>
-
-<script type="module">
-// ============================================================
-// FIREBASE SYNC LAYER (added without changing existing features)
-// ============================================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore, doc, setDoc, onSnapshot, collection, addDoc, updateDoc,
-  query, orderBy, serverTimestamp, where
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBhCDHCfbiA5UL97szEaHPKRDBbhPlXU9k",
-  authDomain: "changmoocoffee-pos.firebaseapp.com",
-  projectId: "changmoocoffee-pos",
-  storageBucket: "changmoocoffee-pos.firebasestorage.app",
-  messagingSenderId: "277439337705",
-  appId: "1:277439337705:web:af1a6d68b6c924cd704c78",
-  measurementId: "G-PKES3T2R8Q"
-};
-
-const fbApp = initializeApp(firebaseConfig);
-const fbDb = getFirestore(fbApp);
-
-// Cloud helpers — attached to window so the non-module script below can call them
-window.cloud = {
-  ready: false,
-  suppressMenuPush: false, // when true, we're applying remote changes; don't echo
-  liveOrders: [],          // customer orders (source: "menu"), pending/making
-  pushMenu: null,          // set after init
-  pushSale: null,
-  markOrderDone: null
-};
-
-// Init — subscribe to menu + customer orders after loadState() has populated locals
-window.cloudInit = function cloudInit() {
-  const menuRef = doc(fbDb, "config", "menu");
-
-  // 1) Sync local menu UP to cloud on first load (so remote copy reflects what's on this device)
-  const pushMenu = async () => {
-    if (window.cloud.suppressMenuPush) return;
-    try {
-      await setDoc(menuRef, {
-        products: products || [],
-        addons: addons || [],
-        categories: categories || [],
-        updatedAt: serverTimestamp()
-      });
-    } catch (e) { console.error("pushMenu failed:", e); }
-  };
-  window.cloud.pushMenu = pushMenu;
-
-  // 2) Listen for menu updates from other devices
-  let firstMenu = true;
-  onSnapshot(menuRef, (snap) => {
-    if (!snap.exists()) {
-      // first ever — seed the cloud with the local menu
-      pushMenu();
-      return;
-    }
-    const data = snap.data();
-    if (firstMenu) {
-      firstMenu = false;
-      // on first load, if cloud has data, adopt it (so iPad sees same menu as computer)
-      if (data.products && Array.isArray(data.products) && data.products.length > 0) {
-        window.cloud.suppressMenuPush = true;
-        products = data.products;
-        addons = data.addons || addons;
-        categories = data.categories || categories;
-        if (!categories.find(c => c.id === activeCat)) activeCat = categories[0]?.id || activeCat;
-        saveMenu(); // update localStorage
-        renderCategories(); renderProducts();
-        if (document.getElementById("menuView").classList.contains("active")) renderMenuEditor();
-        window.cloud.suppressMenuPush = false;
-      } else {
-        // cloud was seeded but empty — push local
-        pushMenu();
-      }
-    } else {
-      // later updates from another device
-      window.cloud.suppressMenuPush = true;
-      products = data.products || products;
-      addons = data.addons || addons;
-      categories = data.categories || categories;
-      if (!categories.find(c => c.id === activeCat)) activeCat = categories[0]?.id || activeCat;
-      saveMenu();
-      renderCategories(); renderProducts();
-      if (document.getElementById("menuView").classList.contains("active")) renderMenuEditor();
-      window.cloud.suppressMenuPush = false;
-      if (typeof toast === "function") toast("✓ Menu updated from another device");
-    }
-    window.cloud.ready = true;
-  }, (err) => { console.error("menu listener:", err); });
-
-  // 3) Push a sale to cloud (for cross-device reports later)
-  window.cloud.pushSale = async (txn) => {
-    try {
-      await addDoc(collection(fbDb, "sales"), {
-        ...txn,
-        createdAt: serverTimestamp()
-      });
-    } catch (e) { console.error("pushSale failed:", e); }
-  };
-
-  // 4) Listen for incoming customer orders (from QR menu)
-  const ordersQ = query(collection(fbDb, "orders"), orderBy("createdAt", "desc"));
-  onSnapshot(ordersQ, (snap) => {
-    const arr = snap.docs
-      .map(d => ({ id: d.id, ...d.data() }))
-      .filter(o => (o.source === "menu") && (o.status === "pending" || o.status === "making"));
-    const prevCount = window.cloud.liveOrders.length;
-    window.cloud.liveOrders = arr;
-    const badge = document.getElementById("liveOrdersBadge");
-    const countEl = document.getElementById("liveOrdersCount");
-    if (arr.length > 0) {
-      badge.style.display = "block";
-      countEl.textContent = arr.length;
-      if (arr.length > prevCount && typeof toast === "function") toast("🔔 New customer order!");
-    } else {
-      badge.style.display = "none";
-    }
-    if (document.getElementById("liveOrdersModal").style.display === "flex") renderLiveOrders();
-  }, (err) => { console.error("orders listener:", err); });
-
-  // 5) Mark a customer order as done
-  window.cloud.markOrderDone = async (id) => {
-    try { await updateDoc(doc(fbDb, "orders", id), { status: "done" }); }
-    catch (e) { alert("Update failed: " + e.message); }
-  };
-  window.cloud.cancelOrder = async (id) => {
-    try { await updateDoc(doc(fbDb, "orders", id), { status: "cancelled" }); }
-    catch (e) { alert("Cancel failed: " + e.message); }
-  };
-  window.cloud.startMaking = async (id) => {
-    try { await updateDoc(doc(fbDb, "orders", id), { status: "making" }); }
-    catch (e) { alert("Update failed: " + e.message); }
-  };
-};
-
-// UI: live orders modal
-window.openLiveOrders = function() {
-  document.getElementById("liveOrdersModal").style.display = "flex";
-  renderLiveOrders();
-};
-window.closeLiveOrders = function() {
-  document.getElementById("liveOrdersModal").style.display = "none";
-};
-
-function renderLiveOrders() {
-  const list = window.cloud.liveOrders || [];
-  const el = document.getElementById("liveOrdersList");
-  if (!list.length) {
-    el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#a08b78;">No pending customer orders</div>`;
-    return;
-  }
-  el.innerHTML = list.map(o => {
-    const tm = o.createdAt?.toDate?.();
-    const tmStr = tm ? tm.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "…";
-    const items = (o.items || []).map(it => {
-      const ax = it.addons?.length ? `<div style="font-size:11px;color:#7a5f47;padding-left:10px;">+ ${it.addons.map(a => a.name).join(", ")}</div>` : "";
-      return `<div>${it.qty}× ${it.name}</div>${ax}`;
-    }).join("");
-    const statusBtn = o.status === "pending"
-      ? `<button class="btn btn-primary" onclick="window.cloud.startMaking('${o.id}')" style="padding:8px 14px;font-size:13px;">Start Making</button>`
-      : `<button class="btn btn-primary" onclick="acceptLiveOrder('${o.id}')" style="padding:8px 14px;font-size:13px;">Mark Done & Record Sale</button>`;
-    return `<div style="background:#f8f4ed;border-radius:8px;padding:12px;margin-bottom:10px;border-left:4px solid ${o.status==='making'?'#3b82f6':'#c08552'};">
-      <div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px;margin-bottom:4px;">
-        <span>${o.table ? "Table " + o.table : "Takeaway"}</span><span>฿${Number(o.total||0).toFixed(0)}</span>
-      </div>
-      <div style="font-size:11px;color:#7a5f47;margin-bottom:8px;">${tmStr} · ${o.status}</div>
-      <div style="font-size:13px;line-height:1.5;margin-bottom:10px;">${items}</div>
-      <div style="display:flex;gap:6px;">
-        ${statusBtn}
-        <button class="btn btn-danger" onclick="window.cloud.cancelOrder('${o.id}')" style="padding:8px 14px;font-size:13px;">Cancel</button>
-      </div>
-    </div>`;
-  }).join("");
-}
-window.renderLiveOrders = renderLiveOrders;
-
-// When staff accepts a customer order, record it as a sale (so it shows in Sales report)
-// and mark the cloud order as done
-window.acceptLiveOrder = function(id) {
-  const o = window.cloud.liveOrders.find(x => x.id === id);
-  if (!o) return;
-  // synthesize a transaction object matching local `transactions` shape
-  const txn = {
-    id: "t" + Date.now() + Math.random().toString(36).slice(2,6),
-    time: new Date().toISOString(),
-    items: (o.items || []).map(it => ({
-      name: it.name,
-      price: it.price,
-      qty: it.qty,
-      addons: (it.addons || []).map(a => ({ name: a.name, price: a.price })),
-      // try to find category from local products
-      cat: (products.find(p => p.name === it.name) || {}).cat || "uncat"
-    })),
-    total: o.total || 0,
-    payment: "QR Menu",
-    voided: false
-  };
-  transactions.push(txn);
-  saveDay();
-  renderReport();
-  updateWarning && updateWarning();
-  window.cloud.markOrderDone(id);
-  if (typeof toast === "function") toast("✓ Order recorded as sale");
-};
-
-// Firebase will be kicked off after the main app finishes loadState()
-window.__fbReady = true;
-if (window.__afterLoad) window.__afterLoad();
-</script>
-
 <script>
 // ========== TRANSLATIONS ==========
 const T = {
   en: {
-    brand: "Changmoo Coffee", tab_register: "Register", tab_sales: "Sales", tab_menu: "Menu",
+    brand: "Coffee Shop POS", tab_register: "Register", tab_sales: "Sales", tab_menu: "Menu",
     current_order: "Current Order", clear: "Clear", tap_to_start: "Tap items to start an order",
     subtotal: "Subtotal", items: "Items", total: "Total",
     cash: "Cash", mobile_pay: "Mobile Pay", modifiers: "Modifiers", remove: "Remove", free: "Free",
@@ -642,10 +430,10 @@ const T = {
     prev_day_msg: "Sales from a previous day were found. Export them before resetting for today?",
     export_and_reset: "Export & Reset", discard: "Discard",
     uncategorized: "Uncategorized",
-    new_customer_orders: "new orders", customer_orders: "Customer Orders"
+    sold_out: "Sold Out", toast_sold_out: "Item is sold out", mark_sold_out: "Mark sold out", mark_available: "Mark available"
   },
   th: {
-    brand: "ร้านกาแฟของช่างหมู", tab_register: "ขาย", tab_sales: "ยอดขาย", tab_menu: "เมนู",
+    brand: "ร้านกาแฟ POS", tab_register: "ขาย", tab_sales: "ยอดขาย", tab_menu: "เมนู",
     current_order: "ออเดอร์ปัจจุบัน", clear: "ล้าง", tap_to_start: "แตะสินค้าเพื่อเริ่มออเดอร์",
     subtotal: "ยอดรวมย่อย", items: "จำนวน", total: "ทั้งหมด",
     cash: "เงินสด", mobile_pay: "จ่ายผ่านมือถือ", modifiers: "เพิ่มเติม", remove: "ลบ", free: "ฟรี",
@@ -684,10 +472,10 @@ const T = {
     prev_day_msg: "พบยอดขายจากวันก่อน ส่งออกก่อนเริ่มวันใหม่?",
     export_and_reset: "ส่งออกและรีเซ็ต", discard: "ละทิ้ง",
     uncategorized: "ไม่มีหมวดหมู่",
-    new_customer_orders: "ออเดอร์ใหม่", customer_orders: "ออเดอร์จากลูกค้า"
+    sold_out: "หมด", toast_sold_out: "สินค้าหมดแล้ว", mark_sold_out: "ทำเครื่องหมายว่าหมด", mark_available: "ทำเครื่องหมายว่ามี"
   },
   zh: {
-    brand: "Changmoo Coffee", tab_register: "收银", tab_sales: "销售", tab_menu: "菜单",
+    brand: "咖啡店 POS", tab_register: "收银", tab_sales: "销售", tab_menu: "菜单",
     current_order: "当前订单", clear: "清除", tap_to_start: "点击商品开始下单",
     subtotal: "小计", items: "件数", total: "合计",
     cash: "现金", mobile_pay: "移动支付", modifiers: "附加项", remove: "移除", free: "免费",
@@ -726,7 +514,7 @@ const T = {
     prev_day_msg: "发现上一天的销售记录。重置今日前导出？",
     export_and_reset: "导出并重置", discard: "丢弃",
     uncategorized: "未分类",
-    new_customer_orders: "新订单", customer_orders: "顾客订单"
+    sold_out: "售罄", toast_sold_out: "商品已售罄", mark_sold_out: "标记为售罄", mark_available: "标记为有货"
   }
 };
 let lang = "en";
@@ -801,7 +589,6 @@ const KEY_LANG = "coffee_pos_lang_v2";
 
 function saveMenu() {
   try { localStorage.setItem(KEY_MENU, JSON.stringify({ products, addons, categories })); } catch(e) { console.error(e); }
-  // push to Firebase for cross-device sync
   if (window.cloud && window.cloud.pushMenu) window.cloud.pushMenu();
 }
 function saveDay() {
@@ -933,13 +720,15 @@ function renderProducts() {
     $("#products").innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#a08b78;padding:40px;">${t("no_products_cat")}</div>`;
     return;
   }
-  $("#products").innerHTML = list.map(p =>
-    `<button class="product" data-id="${p.id}">
+  $("#products").innerHTML = list.map(p => {
+    const out = p.available === false;
+    return `<button class="product${out ? ' unavailable' : ''}" data-id="${p.id}">
       ${p.image ? `<img src="${p.image}" alt="">` : ""}
       <div class="name">${escapeHtml(getName(p))}</div>
       <div class="price">${fmt(p.price)}</div>
-    </button>`
-  ).join("");
+      ${out ? `<div class="sold-out-badge">${t("sold_out")}</div>` : ""}
+    </button>`;
+  }).join("");
   $$(".product").forEach(b => b.addEventListener("click", () => addToCart(b.dataset.id)));
 }
 
@@ -947,6 +736,7 @@ function renderProducts() {
 function addToCart(productId) {
   const p = products.find(x => x.id === productId);
   if (!p) return;
+  if (p.available === false) { toast(t("toast_sold_out")); return; }
   cart.push({ lineId: uid(), productId: p.id, name: getName(p), cat: p.cat, price: p.price, qty: 1, addons: [] });
   renderCart();
 }
@@ -1028,7 +818,6 @@ function payWith(method) {
     total, payment: method
   };
   transactions.push(txn);
-  // push to cloud for cross-device reporting
   if (window.cloud && window.cloud.pushSale) window.cloud.pushSale(txn);
   cart = []; renderCart(); updateWarning(); saveDay();
   $("#confirmAmount").textContent = fmt(total);
@@ -1230,6 +1019,17 @@ function printReport() {
   w.document.close(); w.focus(); setTimeout(() => w.print(), 300);
 }
 
+// ========== AVAILABILITY TOGGLE ==========
+function toggleAvailable(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  p.available = (p.available === false) ? true : false;
+  saveMenu();
+  renderMenuEditor();
+  renderProducts();
+  toast(p.available === false ? t("mark_sold_out") : t("mark_available"));
+}
+
 // ========== MENU EDITOR ==========
 function renderMenuEditor() {
   const grouped = {}; categories.forEach(c => grouped[c.id] = []);
@@ -1239,13 +1039,17 @@ function renderMenuEditor() {
       <div style="font-weight:600;color:#7a5f47;margin-bottom:6px;font-size:13px;text-transform:uppercase;">${escapeHtml(getName(c))}</div>
       <div class="editor-list">
         ${grouped[c.id].length === 0 ? '<div style="color:#a08b78;font-size:13px;padding:8px;">—</div>' :
-          grouped[c.id].map(p => `<div class="editor-item">
+          grouped[c.id].map(p => {
+            const out = p.available === false;
+            return `<div class="editor-item">
             ${p.image ? `<img src="${p.image}" alt="">` : '<div style="width:42px;height:42px;border-radius:6px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#d9cbb5;font-size:18px;">☕</div>'}
-            <div class="ename">${escapeHtml(getName(p))}</div>
+            <div class="ename">${escapeHtml(getName(p))}${out ? ` <span class="sold-out-badge">${t("sold_out")}</span>` : ""}</div>
             <div class="eprice">${fmt(p.price)}</div>
+            <button class="toggle-avail ${out ? 'off' : ''}" title="${out ? t("mark_available") : t("mark_sold_out")}" onclick="toggleAvailable('${p.id}')">${out ? '✕' : '✓'}</button>
             <button class="icon-btn" onclick="openProductEditor('${p.id}')">✎</button>
             <button class="icon-btn del" onclick="deleteProduct('${p.id}')">🗑</button>
-          </div>`).join("")}
+          </div>`;
+          }).join("")}
       </div>
     </div>`).join("");
 
@@ -1443,6 +1247,19 @@ window.addEventListener("beforeunload", (e) => {
   // Data is saved in localStorage continuously, so no prompt needed.
 });
 
+// ========== CLOUD BRIDGE (lexical bindings → window) ==========
+window.__getMenu = () => ({ products, addons, categories });
+window.__setMenu = (m) => {
+  if (Array.isArray(m.products))   products   = m.products;
+  if (Array.isArray(m.addons))     addons     = m.addons;
+  if (Array.isArray(m.categories) && m.categories.length) categories = m.categories;
+  try { localStorage.setItem(KEY_MENU, JSON.stringify({ products, addons, categories })); } catch(e) {}
+  if (typeof renderCategories === "function") renderCategories();
+  if (typeof renderProducts   === "function") renderProducts();
+  if ($("#menuView").classList.contains("active") && typeof renderMenuEditor === "function") renderMenuEditor();
+};
+window.__toast = (msg) => toast(msg);
+
 // ========== INIT ==========
 loadState();
 setLang(lang);
@@ -1450,10 +1267,101 @@ renderCart();
 updateWarning();
 if (pendingOldDay) setTimeout(showOldDayPrompt, 300);
 
-// ========== FIREBASE SYNC INIT ==========
-// Wait until the module script has finished loading Firebase, then start sync
 function __startCloud() { if (window.cloudInit) window.cloudInit(); }
 if (window.__fbReady) __startCloud(); else window.__afterLoad = __startCloud;
 </script>
+
+<!-- ========== FIREBASE SYNC LAYER ========== -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBhCDHCfbiA5UL97szEaHPKRDBbhPlXU9k",
+    authDomain: "changmoocoffee-pos.firebaseapp.com",
+    projectId: "changmoocoffee-pos",
+    storageBucket: "changmoocoffee-pos.firebasestorage.app",
+    messagingSenderId: "277439337705",
+    appId: "1:277439337705:web:af1a6d68b6c924cd704c78",
+    measurementId: "G-PKES3T2R8Q"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  let suppressMenuPush = false;
+  let menuLoaded = false;
+
+  // Push the current menu (products + addons + categories) to the cloud
+  async function pushMenu() {
+    if (suppressMenuPush) return;
+    try {
+      const m = (typeof window.__getMenu === "function") ? window.__getMenu() : { products: [], addons: [], categories: [] };
+      await setDoc(doc(db, "config", "menu"), {
+        products:   m.products   || [],
+        addons:     m.addons     || [],
+        categories: m.categories || [],
+        updatedAt:  serverTimestamp()
+      });
+    } catch (e) { console.error("pushMenu", e); }
+  }
+
+  // Push a completed sale
+  async function pushSale(txn) {
+    try {
+      await addDoc(collection(db, "sales"), { ...txn, createdAt: serverTimestamp() });
+    } catch (e) { console.error("pushSale", e); }
+  }
+
+  // Listen for menu updates from other devices
+  function listenMenu() {
+    onSnapshot(doc(db, "config", "menu"), snap => {
+      if (!snap.exists()) {
+        // First-time setup: push the local menu up
+        if (menuLoaded === false) { menuLoaded = true; pushMenu(); }
+        return;
+      }
+      const data = snap.data();
+      if (!data) return;
+      suppressMenuPush = true;
+      if (typeof window.__setMenu === "function") {
+        window.__setMenu({
+          products:   data.products,
+          addons:     data.addons,
+          categories: data.categories
+        });
+      }
+      menuLoaded = true;
+      setTimeout(() => { suppressMenuPush = false; }, 200);
+    }, err => console.error("listenMenu", err));
+  }
+
+  // Listen for orders sent from the customer-facing QR menu
+  function listenOrders() {
+    onSnapshot(collection(db, "orders"), snap => {
+      snap.docChanges().forEach(ch => {
+        if (ch.type !== "added") return;
+        const o = ch.doc.data();
+        if (!o) return;
+        if (typeof window.__toast === "function") {
+          window.__toast("🔔 New customer order: ฿" + (o.total || 0));
+        }
+      });
+    }, err => console.error("listenOrders", err));
+  }
+
+  // Expose API for the non-module script
+  window.cloud = { pushMenu, pushSale };
+
+  window.cloudInit = function () {
+    listenMenu();
+    listenOrders();
+  };
+
+  window.__fbReady = true;
+  if (typeof window.__afterLoad === "function") window.__afterLoad();
+</script>
+
 </body>
 </html>
