@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Coffee Shop POS</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Thai", "Noto Sans SC", Roboto, sans-serif; background: #f3ede3; color: #2b2018; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, select, textarea { font-family: inherit; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #3e2a1f; color: #f3ede3; height: 56px; gap: 10px; }
+  .brand { font-weight: 700; font-size: 18px; letter-spacing: 0.5px; white-space: nowrap; }
+  .tabs { display: flex; gap: 6px; }
+  .tab { padding: 10px 16px; border-radius: 8px; font-size: 15px; font-weight: 600; background: rgba(255,255,255,0.08); color: #f3ede3; white-space: nowrap; }
+  .tab.active { background: #c08552; color: #fff; }
+  .topright { display: flex; align-items: center; gap: 10px; }
+  .lang-switch { display: flex; gap: 2px; background: rgba(255,255,255,0.08); border-radius: 6px; padding: 2px; }
+  .lang-btn { padding: 6px 10px; border-radius: 5px; font-size: 12px; font-weight: 600; color: #f3ede3; }
+  .lang-btn.active { background: #c08552; color: #fff; }
+  .clock { font-size: 13px; opacity: 0.8; min-width: 70px; text-align: right; }
+
+  .view { display: none; height: calc(100% - 56px); }
+  .view.active { display: flex; }
+
+  #posView { flex-direction: row; }
+  .menu-pane { flex: 1.4; display: flex; flex-direction: column; padding: 12px; overflow: hidden; }
+  .cats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .cat { padding: 10px 16px; border-radius: 20px; background: #fff; font-weight: 600; font-size: 14px; border: 2px solid transparent; }
+  .cat.active { background: #c08552; color: #fff; border-color: #a66f3e; }
+  .products { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding-bottom: 12px; -webkit-overflow-scrolling: touch; }
+  .product { background: #fff; border-radius: 12px; padding: 10px; text-align: center; min-height: 100px; display: flex; flex-direction: column; justify-content: center; border: 2px solid #e8dfd0; transition: transform 0.05s; overflow: hidden; }
+  .product:active { transform: scale(0.96); background: #f8efdf; }
+  .product img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; margin-bottom: 6px; background: #f3ede3; }
+  .product .name { font-weight: 600; font-size: 14px; line-height: 1.2; margin-bottom: 4px; }
+  .product .price { font-size: 13px; color: #7a5f47; font-weight: 600; }
+
+  .cart-pane { flex: 1; background: #fff; display: flex; flex-direction: column; border-left: 1px solid #e8dfd0; min-width: 320px; }
+  .cart-header { padding: 14px 16px; border-bottom: 1px solid #e8dfd0; display: flex; justify-content: space-between; align-items: center; }
+  .cart-header h2 { font-size: 17px; }
+  .cart-clear { font-size: 13px; color: #b54a3a; font-weight: 600; padding: 6px 10px; }
+  .cart-items { flex: 1; overflow-y: auto; padding: 8px 0; -webkit-overflow-scrolling: touch; }
+  .cart-empty { padding: 40px 16px; text-align: center; color: #a08b78; font-size: 14px; }
+  .cart-item { padding: 10px 16px; border-bottom: 1px solid #f3ede3; }
+  .cart-item-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .cart-item-name { font-weight: 600; font-size: 15px; }
+  .cart-item-price { font-weight: 600; font-size: 15px; }
+  .cart-item-addons { font-size: 12px; color: #7a5f47; margin-top: 4px; line-height: 1.4; }
+  .cart-item-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .qty-btn { width: 32px; height: 32px; border-radius: 16px; background: #f3ede3; font-size: 18px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .qty-val { min-width: 24px; text-align: center; font-weight: 600; }
+  .add-addon { margin-left: auto; font-size: 12px; color: #c08552; font-weight: 600; padding: 6px 10px; border: 1px solid #c08552; border-radius: 14px; }
+  .remove-item { font-size: 12px; color: #b54a3a; font-weight: 600; padding: 6px; }
+
+  .cart-footer { border-top: 1px solid #e8dfd0; padding: 14px 16px; }
+  .total-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 14px; }
+  .total-row.grand { font-size: 20px; font-weight: 700; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e8dfd0; }
+  .pay-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .pay-btn { padding: 18px; border-radius: 12px; font-weight: 700; font-size: 16px; color: #fff; }
+  .pay-cash { background: #4a7c59; }
+  .pay-mobile { background: #2c5282; }
+  .pay-btn:active { opacity: 0.85; }
+  .pay-btn:disabled { opacity: 0.4; }
+
+  #reportView { padding: 20px; flex-direction: column; overflow-y: auto; }
+  .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .report-header h1 { font-size: 22px; }
+  .report-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn { padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  .btn-primary { background: #c08552; color: #fff; }
+  .btn-secondary { background: #fff; color: #3e2a1f; border: 1px solid #c08552; }
+  .btn-danger { background: #fff; color: #b54a3a; border: 1px solid #b54a3a; }
+  .btn.small { padding: 6px 10px; font-size: 12px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .summary-card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #e8dfd0; }
+  .summary-card .label { font-size: 12px; text-transform: uppercase; color: #7a5f47; font-weight: 600; letter-spacing: 0.5px; }
+  .summary-card .value { font-size: 24px; font-weight: 700; margin-top: 6px; color: #3e2a1f; }
+  .summary-card .sub { font-size: 12px; color: #a08b78; margin-top: 2px; }
+
+  .report-section { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e8dfd0; }
+  .report-section h2 { font-size: 16px; margin-bottom: 12px; color: #3e2a1f; }
+  .top-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+  .top-row { display: flex; justify-content: space-between; padding: 8px 10px; background: #f3ede3; border-radius: 6px; font-size: 14px; }
+  .top-row .qty { color: #7a5f47; font-weight: 600; }
+  .cat-bar { position: relative; padding: 10px 12px; background: #f8f4ed; border-radius: 6px; margin-bottom: 6px; overflow: hidden; }
+  .cat-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; background: rgba(192,133,82,0.18); border-radius: 6px; transition: width 0.3s; }
+  .cat-bar-content { position: relative; display: flex; justify-content: space-between; font-size: 14px; }
+  .cat-bar-name { font-weight: 600; }
+  .cat-bar-stats { color: #7a5f47; font-weight: 600; }
+
+  .txn-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .txn-table th, .txn-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #f3ede3; }
+  .txn-table th { background: #f3ede3; font-weight: 600; position: sticky; top: 0; font-size: 12px; text-transform: uppercase; color: #7a5f47; }
+  .txn-items { color: #7a5f47; font-size: 12px; }
+  .void-btn { color: #b54a3a; font-size: 12px; font-weight: 600; padding: 4px 8px; }
+
+  #menuView { padding: 20px; flex-direction: column; overflow-y: auto; }
+  .menu-editor-section { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e8dfd0; }
+  .menu-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+  .editor-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+  .editor-item { background: #f8f4ed; border-radius: 8px; padding: 10px; display: flex; align-items: center; gap: 8px; }
+  .editor-item img { width: 42px; height: 42px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: #fff; }
+  .editor-item .ename { flex: 1; font-weight: 600; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .editor-item .eprice { font-weight: 600; color: #7a5f47; font-size: 13px; }
+  .icon-btn { width: 32px; height: 32px; border-radius: 6px; background: #fff; font-size: 14px; flex-shrink: 0; }
+  .icon-btn.del { color: #b54a3a; }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: #fff; border-radius: 14px; max-width: 520px; width: 100%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
+  .modal-header { padding: 16px; border-bottom: 1px solid #e8dfd0; display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h2 { font-size: 17px; }
+  .modal-close { width: 36px; height: 36px; border-radius: 18px; background: #f3ede3; font-size: 20px; }
+  .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
+  .modal-footer { padding: 14px 16px; border-top: 1px solid #e8dfd0; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+  .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .addon-option { padding: 12px; border-radius: 8px; background: #f8f4ed; text-align: left; border: 2px solid transparent; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; }
+  .addon-option.selected { border-color: #c08552; background: #fff; }
+  .addon-option .apr { font-size: 12px; color: #7a5f47; }
+
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #3e2a1f; }
+  .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #d9cbb5; border-radius: 8px; font-size: 15px; background: #fff; }
+  .form-group input:focus, .form-group select:focus { outline: 2px solid #c08552; border-color: #c08552; }
+  .name-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .name-grid .form-group { margin-bottom: 0; }
+  @media (max-width: 500px) { .name-grid { grid-template-columns: 1fr; } }
+
+  .image-picker { display: flex; gap: 12px; align-items: flex-start; }
+  .image-preview { width: 90px; height: 90px; border-radius: 10px; background: #f3ede3; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; color: #a08b78; font-size: 11px; text-align: center; padding: 6px; border: 1px dashed #d9cbb5; }
+  .image-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .image-buttons { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+
+  .confirm-msg { text-align: center; padding: 10px 0; }
+  .confirm-msg .big { font-size: 28px; font-weight: 700; color: #4a7c59; margin: 10px 0; }
+
+  .warning-bar { background: #fff4d6; color: #6b4a00; padding: 8px 16px; font-size: 13px; text-align: center; border-bottom: 1px solid #e6d9a8; }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #d9cbb5; border-radius: 4px; }
+
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #3e2a1f; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 800px) {
+    #posView { flex-direction: column; }
+    .cart-pane { border-left: none; border-top: 1px solid #e8dfd0; min-width: 0; max-height: 45%; }
+    .products { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+    .brand { font-size: 15px; }
+    .tab { padding: 8px 10px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">☕ <span data-i18n="brand">Coffee Shop POS</span></div>
+  <div class="tabs">
+    <button class="tab active" data-view="posView" data-i18n="tab_register">Register</button>
+    <button class="tab" data-view="reportView" data-i18n="tab_sales">Sales</button>
+    <button class="tab" data-view="menuView" data-i18n="tab_menu">Menu</button>
+  </div>
+  <div class="topright">
+    <div class="lang-switch">
+      <button class="lang-btn active" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="th">ไทย</button>
+      <button class="lang-btn" data-lang="zh">中文</button>
+    </div>
+    <div class="clock" id="clock"></div>
+  </div>
+</div>
+
+<div class="warning-bar" id="warningBar" style="display:none;" data-i18n="warning_unsaved">⚠ You have unsaved sales. Export CSV from the Sales tab before closing.</div>
+
+<div id="posView" class="view active">
+  <div class="menu-pane">
+    <div class="cats" id="cats"></div>
+    <div class="products" id="products"></div>
+  </div>
+  <div class="cart-pane">
+    <div class="cart-header">
+      <h2 data-i18n="current_order">Current Order</h2>
+      <button class="cart-clear" onclick="clearCart()" data-i18n="clear">Clear</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <div class="total-row"><span data-i18n="subtotal">Subtotal</span><span id="subtotal">฿0</span></div>
+      <div class="total-row"><span data-i18n="items">Items</span><span id="itemCount">0</span></div>
+      <div class="total-row grand"><span data-i18n="total">Total</span><span id="total">฿0</span></div>
+      <div class="pay-buttons">
+        <button class="pay-btn pay-cash" id="btnCash" onclick="payWith('Cash')" disabled>💵 <span data-i18n="cash">Cash</span></button>
+        <button class="pay-btn pay-mobile" id="btnMobile" onclick="payWith('Mobile')" disabled>📱 <span data-i18n="mobile_pay">Mobile Pay</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="reportView" class="view">
+  <div class="report-header">
+    <div>
+      <h1 data-i18n="todays_sales">Today's Sales</h1>
+      <div id="reportDate" style="font-size:13px;color:#7a5f47;margin-top:4px;"></div>
+    </div>
+    <div class="report-actions">
+      <button class="btn btn-primary" onclick="exportCSV()">⬇ <span data-i18n="export_csv">Export CSV</span></button>
+      <button class="btn btn-secondary" onclick="printReport()">🖨 <span data-i18n="print">Print</span></button>
+      <button class="btn btn-danger" onclick="resetDay()" data-i18n="reset_day">Reset Day</button>
+    </div>
+  </div>
+  <div class="summary-grid" id="summaryGrid"></div>
+  <div class="report-section">
+    <h2 data-i18n="sales_by_category">Sales by Category</h2>
+    <div id="catSalesList"></div>
+  </div>
+  <div class="report-section">
+    <h2 data-i18n="top_sellers">Top Sellers</h2>
+    <div class="top-list" id="topList"></div>
+  </div>
+  <div class="report-section">
+    <h2 data-i18n="all_transactions">All Transactions</h2>
+    <div style="overflow-x:auto;">
+      <table class="txn-table" id="txnTable">
+        <thead><tr><th data-i18n="time">Time</th><th data-i18n="items">Items</th><th data-i18n="payment">Payment</th><th style="text-align:right;" data-i18n="total">Total</th><th></th></tr></thead>
+        <tbody id="txnBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="menuView" class="view">
+  <div class="menu-editor-section">
+    <div class="menu-editor-header">
+      <h2 data-i18n="products">Products</h2>
+      <button class="btn btn-primary" onclick="openProductEditor()">+ <span data-i18n="add_product">Add Product</span></button>
+    </div>
+    <div id="productEditor"></div>
+  </div>
+  <div class="menu-editor-section">
+    <div class="menu-editor-header">
+      <h2 data-i18n="modifiers_header">Add-ons / Modifiers</h2>
+      <button class="btn btn-primary" onclick="openAddonEditor()">+ <span data-i18n="add_modifier">Add Modifier</span></button>
+    </div>
+    <div class="editor-list" id="addonEditor"></div>
+  </div>
+  <div class="menu-editor-section">
+    <div class="menu-editor-header"><h2 data-i18n="categories">Categories</h2><button class="btn btn-primary" onclick="openCategoryEditor()">+ <span data-i18n="add_category">Add Category</span></button></div>
+    <div class="editor-list" id="catEditor"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addonModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="addonModalTitle">Modifiers</h2>
+      <button class="modal-close" onclick="closeAddonModal()">×</button>
+    </div>
+    <div class="modal-body"><div class="addon-grid" id="addonGrid"></div></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAddonModal()" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAddons()" data-i18n="done">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="productModalTitle" data-i18n="add_product">Add Product</h2>
+      <button class="modal-close" onclick="closeProductModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label data-i18n="image">Image</label>
+        <div class="image-picker">
+          <div class="image-preview" id="prodImagePreview"><span data-i18n="no_image">No image</span></div>
+          <div class="image-buttons">
+            <input type="file" id="prodImageInput" accept="image/*" style="display:none;">
+            <button type="button" class="btn btn-secondary small" onclick="document.getElementById('prodImageInput').click()" data-i18n="upload_image">Upload</button>
+            <button type="button" class="btn btn-secondary small" onclick="removeProdImage()" data-i18n="remove_image">Remove</button>
+          </div>
+        </div>
+      </div>
+      <div class="name-grid">
+        <div class="form-group"><label>Name (EN)</label><input type="text" id="prodNameEn"></div>
+        <div class="form-group"><label>ชื่อ (TH)</label><input type="text" id="prodNameTh"></div>
+        <div class="form-group"><label>名称 (ZH)</label><input type="text" id="prodNameZh"></div>
+      </div>
+      <div class="form-group"><label data-i18n="price_label">Price (฿)</label><input type="number" id="prodPrice" step="0.01" min="0" inputmode="decimal"></div>
+      <div class="form-group"><label data-i18n="category">Category</label><select id="prodCat"></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeProductModal()" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProduct()" data-i18n="save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addonEditorModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="addonEditorTitle" data-i18n="add_modifier">Add Modifier</h2>
+      <button class="modal-close" onclick="closeAddonEditorModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="name-grid">
+        <div class="form-group"><label>Name (EN)</label><input type="text" id="addonNameEn"></div>
+        <div class="form-group"><label>ชื่อ (TH)</label><input type="text" id="addonNameTh"></div>
+        <div class="form-group"><label>名称 (ZH)</label><input type="text" id="addonNameZh"></div>
+      </div>
+      <div class="form-group"><label data-i18n="price_label">Price (฿)</label><input type="number" id="addonPrice" step="0.01" min="0" inputmode="decimal"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAddonEditorModal()" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAddon()" data-i18n="save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="categoryModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="categoryModalTitle" data-i18n="add_category">Add Category</h2>
+      <button class="modal-close" onclick="closeCategoryModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="name-grid">
+        <div class="form-group"><label>Name (EN)</label><input type="text" id="catNameEn"></div>
+        <div class="form-group"><label>ชื่อ (TH)</label><input type="text" id="catNameTh"></div>
+        <div class="form-group"><label>名称 (ZH)</label><input type="text" id="catNameZh"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCategoryModal()" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCategory()" data-i18n="save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-header"><h2 data-i18n="payment_complete">Payment Complete</h2></div>
+    <div class="modal-body">
+      <div class="confirm-msg">
+        <div data-i18n="sale_recorded">Sale recorded successfully</div>
+        <div class="big" id="confirmAmount">฿0</div>
+        <div id="confirmMethod" style="color:#7a5f47;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeConfirm()" style="width:100%;padding:14px;" data-i18n="new_order">New Order</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="oldDayModal">
+  <div class="modal">
+    <div class="modal-header"><h2 data-i18n="prev_day_detected">Previous Day Detected</h2></div>
+    <div class="modal-body">
+      <p data-i18n="prev_day_msg" style="line-height:1.5;">Sales from a previous day were found. Export them before resetting for today?</p>
+      <div id="oldDaySummary" style="margin-top:14px;padding:12px;background:#f3ede3;border-radius:8px;font-size:14px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="oldDayDiscard()" data-i18n="discard">Discard</button>
+      <button class="btn btn-primary" onclick="oldDayExport()" data-i18n="export_and_reset">Export & Reset</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Live customer orders badge + panel (from QR menu) -->
+<div id="liveOrdersBadge" style="display:none;position:fixed;top:70px;right:16px;background:#b54a3a;color:#fff;padding:8px 14px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;z-index:900;box-shadow:0 4px 12px rgba(0,0,0,0.2);" onclick="openLiveOrders()">
+  🔔 <span id="liveOrdersCount">0</span> <span data-i18n="new_customer_orders">new orders</span>
+</div>
+<div id="liveOrdersModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:950;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;width:100%;max-width:560px;max-height:85vh;border-radius:14px;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="padding:14px 18px;border-bottom:1px solid #e8dfd0;display:flex;justify-content:space-between;align-items:center;">
+      <h2 style="font-size:17px;" data-i18n="customer_orders">Customer Orders</h2>
+      <button onclick="closeLiveOrders()" style="background:#f3ede3;width:34px;height:34px;border-radius:17px;font-size:20px;">×</button>
+    </div>
+    <div id="liveOrdersList" style="padding:12px 18px;overflow-y:auto;flex:1;"></div>
+  </div>
+</div>
+
+<script type="module">
+// ============================================================
+// FIREBASE SYNC LAYER (added without changing existing features)
+// ============================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, doc, setDoc, onSnapshot, collection, addDoc, updateDoc,
+  query, orderBy, serverTimestamp, where
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBhCDHCfbiA5UL97szEaHPKRDBbhPlXU9k",
+  authDomain: "changmoocoffee-pos.firebaseapp.com",
+  projectId: "changmoocoffee-pos",
+  storageBucket: "changmoocoffee-pos.firebasestorage.app",
+  messagingSenderId: "277439337705",
+  appId: "1:277439337705:web:af1a6d68b6c924cd704c78",
+  measurementId: "G-PKES3T2R8Q"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const fbDb = getFirestore(fbApp);
+
+// Cloud helpers — attached to window so the non-module script below can call them
+window.cloud = {
+  ready: false,
+  suppressMenuPush: false, // when true, we're applying remote changes; don't echo
+  liveOrders: [],          // customer orders (source: "menu"), pending/making
+  pushMenu: null,          // set after init
+  pushSale: null,
+  markOrderDone: null
+};
+
+// Init — subscribe to menu + customer orders after loadState() has populated locals
+window.cloudInit = function cloudInit() {
+  const menuRef = doc(fbDb, "config", "menu");
+
+  // 1) Sync local menu UP to cloud on first load (so remote copy reflects what's on this device)
+  const pushMenu = async () => {
+    if (window.cloud.suppressMenuPush) return;
+    try {
+      await setDoc(menuRef, {
+        products: products || [],
+        addons: addons || [],
+        categories: categories || [],
+        updatedAt: serverTimestamp()
+      });
+    } catch (e) { console.error("pushMenu failed:", e); }
+  };
+  window.cloud.pushMenu = pushMenu;
+
+  // 2) Listen for menu updates from other devices
+  let firstMenu = true;
+  onSnapshot(menuRef, (snap) => {
+    if (!snap.exists()) {
+      // first ever — seed the cloud with the local menu
+      pushMenu();
+      return;
+    }
+    const data = snap.data();
+    if (firstMenu) {
+      firstMenu = false;
+      // on first load, if cloud has data, adopt it (so iPad sees same menu as computer)
+      if (data.products && Array.isArray(data.products) && data.products.length > 0) {
+        window.cloud.suppressMenuPush = true;
+        products = data.products;
+        addons = data.addons || addons;
+        categories = data.categories || categories;
+        if (!categories.find(c => c.id === activeCat)) activeCat = categories[0]?.id || activeCat;
+        saveMenu(); // update localStorage
+        renderCategories(); renderProducts();
+        if (document.getElementById("menuView").classList.contains("active")) renderMenuEditor();
+        window.cloud.suppressMenuPush = false;
+      } else {
+        // cloud was seeded but empty — push local
+        pushMenu();
+      }
+    } else {
+      // later updates from another device
+      window.cloud.suppressMenuPush = true;
+      products = data.products || products;
+      addons = data.addons || addons;
+      categories = data.categories || categories;
+      if (!categories.find(c => c.id === activeCat)) activeCat = categories[0]?.id || activeCat;
+      saveMenu();
+      renderCategories(); renderProducts();
+      if (document.getElementById("menuView").classList.contains("active")) renderMenuEditor();
+      window.cloud.suppressMenuPush = false;
+      if (typeof toast === "function") toast("✓ Menu updated from another device");
+    }
+    window.cloud.ready = true;
+  }, (err) => { console.error("menu listener:", err); });
+
+  // 3) Push a sale to cloud (for cross-device reports later)
+  window.cloud.pushSale = async (txn) => {
+    try {
+      await addDoc(collection(fbDb, "sales"), {
+        ...txn,
+        createdAt: serverTimestamp()
+      });
+    } catch (e) { console.error("pushSale failed:", e); }
+  };
+
+  // 4) Listen for incoming customer orders (from QR menu)
+  const ordersQ = query(collection(fbDb, "orders"), orderBy("createdAt", "desc"));
+  onSnapshot(ordersQ, (snap) => {
+    const arr = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(o => (o.source === "menu") && (o.status === "pending" || o.status === "making"));
+    const prevCount = window.cloud.liveOrders.length;
+    window.cloud.liveOrders = arr;
+    const badge = document.getElementById("liveOrdersBadge");
+    const countEl = document.getElementById("liveOrdersCount");
+    if (arr.length > 0) {
+      badge.style.display = "block";
+      countEl.textContent = arr.length;
+      if (arr.length > prevCount && typeof toast === "function") toast("🔔 New customer order!");
+    } else {
+      badge.style.display = "none";
+    }
+    if (document.getElementById("liveOrdersModal").style.display === "flex") renderLiveOrders();
+  }, (err) => { console.error("orders listener:", err); });
+
+  // 5) Mark a customer order as done
+  window.cloud.markOrderDone = async (id) => {
+    try { await updateDoc(doc(fbDb, "orders", id), { status: "done" }); }
+    catch (e) { alert("Update failed: " + e.message); }
+  };
+  window.cloud.cancelOrder = async (id) => {
+    try { await updateDoc(doc(fbDb, "orders", id), { status: "cancelled" }); }
+    catch (e) { alert("Cancel failed: " + e.message); }
+  };
+  window.cloud.startMaking = async (id) => {
+    try { await updateDoc(doc(fbDb, "orders", id), { status: "making" }); }
+    catch (e) { alert("Update failed: " + e.message); }
+  };
+};
+
+// UI: live orders modal
+window.openLiveOrders = function() {
+  document.getElementById("liveOrdersModal").style.display = "flex";
+  renderLiveOrders();
+};
+window.closeLiveOrders = function() {
+  document.getElementById("liveOrdersModal").style.display = "none";
+};
+
+function renderLiveOrders() {
+  const list = window.cloud.liveOrders || [];
+  const el = document.getElementById("liveOrdersList");
+  if (!list.length) {
+    el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#a08b78;">No pending customer orders</div>`;
+    return;
+  }
+  el.innerHTML = list.map(o => {
+    const tm = o.createdAt?.toDate?.();
+    const tmStr = tm ? tm.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "…";
+    const items = (o.items || []).map(it => {
+      const ax = it.addons?.length ? `<div style="font-size:11px;color:#7a5f47;padding-left:10px;">+ ${it.addons.map(a => a.name).join(", ")}</div>` : "";
+      return `<div>${it.qty}× ${it.name}</div>${ax}`;
+    }).join("");
+    const statusBtn = o.status === "pending"
+      ? `<button class="btn btn-primary" onclick="window.cloud.startMaking('${o.id}')" style="padding:8px 14px;font-size:13px;">Start Making</button>`
+      : `<button class="btn btn-primary" onclick="acceptLiveOrder('${o.id}')" style="padding:8px 14px;font-size:13px;">Mark Done & Record Sale</button>`;
+    return `<div style="background:#f8f4ed;border-radius:8px;padding:12px;margin-bottom:10px;border-left:4px solid ${o.status==='making'?'#3b82f6':'#c08552'};">
+      <div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px;margin-bottom:4px;">
+        <span>${o.table ? "Table " + o.table : "Takeaway"}</span><span>฿${Number(o.total||0).toFixed(0)}</span>
+      </div>
+      <div style="font-size:11px;color:#7a5f47;margin-bottom:8px;">${tmStr} · ${o.status}</div>
+      <div style="font-size:13px;line-height:1.5;margin-bottom:10px;">${items}</div>
+      <div style="display:flex;gap:6px;">
+        ${statusBtn}
+        <button class="btn btn-danger" onclick="window.cloud.cancelOrder('${o.id}')" style="padding:8px 14px;font-size:13px;">Cancel</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+window.renderLiveOrders = renderLiveOrders;
+
+// When staff accepts a customer order, record it as a sale (so it shows in Sales report)
+// and mark the cloud order as done
+window.acceptLiveOrder = function(id) {
+  const o = window.cloud.liveOrders.find(x => x.id === id);
+  if (!o) return;
+  // synthesize a transaction object matching local `transactions` shape
+  const txn = {
+    id: "t" + Date.now() + Math.random().toString(36).slice(2,6),
+    time: new Date().toISOString(),
+    items: (o.items || []).map(it => ({
+      name: it.name,
+      price: it.price,
+      qty: it.qty,
+      addons: (it.addons || []).map(a => ({ name: a.name, price: a.price })),
+      // try to find category from local products
+      cat: (products.find(p => p.name === it.name) || {}).cat || "uncat"
+    })),
+    total: o.total || 0,
+    payment: "QR Menu",
+    voided: false
+  };
+  transactions.push(txn);
+  saveDay();
+  renderReport();
+  updateWarning && updateWarning();
+  window.cloud.markOrderDone(id);
+  if (typeof toast === "function") toast("✓ Order recorded as sale");
+};
+
+// Firebase will be kicked off after the main app finishes loadState()
+window.__fbReady = true;
+if (window.__afterLoad) window.__afterLoad();
+</script>
+
+<script>
+// ========== TRANSLATIONS ==========
+const T = {
+  en: {
+    brand: "Coffee Shop POS", tab_register: "Register", tab_sales: "Sales", tab_menu: "Menu",
+    current_order: "Current Order", clear: "Clear", tap_to_start: "Tap items to start an order",
+    subtotal: "Subtotal", items: "Items", total: "Total",
+    cash: "Cash", mobile_pay: "Mobile Pay", modifiers: "Modifiers", remove: "Remove", free: "Free",
+    todays_sales: "Today's Sales", export_csv: "Export CSV", print: "Print", reset_day: "Reset Day",
+    revenue: "Revenue", items_sold: "Items Sold", sales_count: "sales", transactions: "transactions", avg_sale: "Avg",
+    top_sellers: "Top Sellers", sales_by_category: "Sales by Category", no_sales_today: "No sales yet today.",
+    all_transactions: "All Transactions", time: "Time", payment: "Payment", void: "Void",
+    no_transactions: "No transactions yet", no_products_cat: "No products in this category",
+    products: "Products", modifiers_header: "Add-ons / Modifiers", categories: "Categories",
+    add_product: "Add Product", add_modifier: "Add Modifier", add_category: "Add Category",
+    edit_product: "Edit Product", edit_modifier: "Edit Modifier", edit_category: "Edit Category",
+    name: "Name", price_label: "Price (฿)", category: "Category",
+    image: "Image", no_image: "No image", upload_image: "Upload", remove_image: "Remove",
+    save: "Save", cancel: "Cancel", done: "Done",
+    payment_complete: "Payment Complete", sale_recorded: "Sale recorded successfully", thank_you: "Thank you!", new_order: "New Order",
+    warning_unsaved: "⚠ You have unsaved sales. Export CSV from the Sales tab to keep a record.",
+    confirm_clear: "Clear current order?",
+    confirm_void: "Void this transaction? It will be removed from today's sales.",
+    confirm_reset: "Reset today's sales? This cannot be undone. Export CSV first if you want to keep a record.",
+    confirm_del_product: "Delete this product?",
+    confirm_del_modifier: "Delete this modifier?",
+    confirm_del_category: "Delete this category?",
+    cat_has_products: "Remove or reassign products in this category first.",
+    toast_no_sales_export: "No sales to export", toast_no_sales_print: "No sales to print",
+    toast_no_sales_reset: "No sales to reset", toast_cat_exists: "Category exists",
+    toast_name_req: "Name (EN) required", toast_price_req: "Valid price required",
+    toast_csv_exported: "CSV exported", toast_day_reset: "Day reset",
+    toast_voided: "Transaction voided", toast_product_added: "Product added",
+    toast_product_updated: "Product updated", toast_modifier_added: "Modifier added",
+    toast_modifier_updated: "Modifier updated", toast_category_added: "Category added",
+    toast_category_updated: "Category updated",
+    toast_midnight: "New day started — yesterday's sales auto-exported.",
+    toast_image_too_large: "Image too large — try a smaller photo",
+    modifiers_for: "Modifiers —",
+    prev_day_detected: "Previous Day Detected",
+    prev_day_msg: "Sales from a previous day were found. Export them before resetting for today?",
+    export_and_reset: "Export & Reset", discard: "Discard",
+    uncategorized: "Uncategorized",
+    new_customer_orders: "new orders", customer_orders: "Customer Orders"
+  },
+  th: {
+    brand: "ร้านกาแฟ POS", tab_register: "ขาย", tab_sales: "ยอดขาย", tab_menu: "เมนู",
+    current_order: "ออเดอร์ปัจจุบัน", clear: "ล้าง", tap_to_start: "แตะสินค้าเพื่อเริ่มออเดอร์",
+    subtotal: "ยอดรวมย่อย", items: "จำนวน", total: "ทั้งหมด",
+    cash: "เงินสด", mobile_pay: "จ่ายผ่านมือถือ", modifiers: "เพิ่มเติม", remove: "ลบ", free: "ฟรี",
+    todays_sales: "ยอดขายวันนี้", export_csv: "ส่งออก CSV", print: "พิมพ์", reset_day: "เริ่มวันใหม่",
+    revenue: "รายได้", items_sold: "สินค้าที่ขาย", sales_count: "ครั้ง", transactions: "รายการ", avg_sale: "เฉลี่ย",
+    top_sellers: "ขายดี", sales_by_category: "ยอดขายตามหมวดหมู่", no_sales_today: "วันนี้ยังไม่มียอดขาย",
+    all_transactions: "รายการทั้งหมด", time: "เวลา", payment: "การชำระเงิน", void: "ยกเลิก",
+    no_transactions: "ยังไม่มีรายการ", no_products_cat: "ไม่มีสินค้าในหมวดนี้",
+    products: "สินค้า", modifiers_header: "ส่วนเสริม", categories: "หมวดหมู่",
+    add_product: "เพิ่มสินค้า", add_modifier: "เพิ่มส่วนเสริม", add_category: "เพิ่มหมวดหมู่",
+    edit_product: "แก้ไขสินค้า", edit_modifier: "แก้ไขส่วนเสริม", edit_category: "แก้ไขหมวดหมู่",
+    name: "ชื่อ", price_label: "ราคา (฿)", category: "หมวดหมู่",
+    image: "รูปภาพ", no_image: "ไม่มีรูป", upload_image: "อัปโหลด", remove_image: "ลบรูป",
+    save: "บันทึก", cancel: "ยกเลิก", done: "เสร็จสิ้น",
+    payment_complete: "ชำระเงินเรียบร้อย", sale_recorded: "บันทึกการขายสำเร็จ", thank_you: "ขอบคุณ!", new_order: "ออเดอร์ใหม่",
+    warning_unsaved: "⚠ มียอดขายที่ยังไม่ได้ส่งออก กรุณาส่งออก CSV เพื่อเก็บบันทึก",
+    confirm_clear: "ล้างออเดอร์ปัจจุบัน?",
+    confirm_void: "ยกเลิกรายการนี้? รายการจะถูกลบออกจากยอดขายวันนี้",
+    confirm_reset: "รีเซ็ตยอดขายวันนี้? ไม่สามารถย้อนกลับได้ ส่งออก CSV ก่อนถ้าต้องการเก็บบันทึก",
+    confirm_del_product: "ลบสินค้านี้?",
+    confirm_del_modifier: "ลบส่วนเสริมนี้?",
+    confirm_del_category: "ลบหมวดหมู่นี้?",
+    cat_has_products: "กรุณาลบหรือย้ายสินค้าในหมวดหมู่นี้ก่อน",
+    toast_no_sales_export: "ไม่มียอดขายให้ส่งออก", toast_no_sales_print: "ไม่มียอดขายให้พิมพ์",
+    toast_no_sales_reset: "ไม่มียอดขายให้รีเซ็ต", toast_cat_exists: "มีหมวดหมู่นี้แล้ว",
+    toast_name_req: "กรุณาใส่ชื่อ (EN)", toast_price_req: "กรุณาใส่ราคาที่ถูกต้อง",
+    toast_csv_exported: "ส่งออก CSV เรียบร้อย", toast_day_reset: "รีเซ็ตวันเรียบร้อย",
+    toast_voided: "ยกเลิกรายการเรียบร้อย", toast_product_added: "เพิ่มสินค้าเรียบร้อย",
+    toast_product_updated: "อัปเดตสินค้าเรียบร้อย", toast_modifier_added: "เพิ่มส่วนเสริมเรียบร้อย",
+    toast_modifier_updated: "อัปเดตส่วนเสริมเรียบร้อย", toast_category_added: "เพิ่มหมวดหมู่เรียบร้อย",
+    toast_category_updated: "อัปเดตหมวดหมู่เรียบร้อย",
+    toast_midnight: "เริ่มวันใหม่ — ยอดขายเมื่อวานถูกส่งออกอัตโนมัติ",
+    toast_image_too_large: "รูปใหญ่เกินไป — ลองใช้รูปที่เล็กกว่านี้",
+    modifiers_for: "ส่วนเสริม —",
+    prev_day_detected: "พบยอดขายวันก่อน",
+    prev_day_msg: "พบยอดขายจากวันก่อน ส่งออกก่อนเริ่มวันใหม่?",
+    export_and_reset: "ส่งออกและรีเซ็ต", discard: "ละทิ้ง",
+    uncategorized: "ไม่มีหมวดหมู่",
+    new_customer_orders: "ออเดอร์ใหม่", customer_orders: "ออเดอร์จากลูกค้า"
+  },
+  zh: {
+    brand: "咖啡店 POS", tab_register: "收银", tab_sales: "销售", tab_menu: "菜单",
+    current_order: "当前订单", clear: "清除", tap_to_start: "点击商品开始下单",
+    subtotal: "小计", items: "件数", total: "合计",
+    cash: "现金", mobile_pay: "移动支付", modifiers: "附加项", remove: "移除", free: "免费",
+    todays_sales: "今日销售", export_csv: "导出 CSV", print: "打印", reset_day: "重置今日",
+    revenue: "营收", items_sold: "已售商品", sales_count: "笔", transactions: "笔交易", avg_sale: "平均",
+    top_sellers: "热销产品", sales_by_category: "按分类销售", no_sales_today: "今日暂无销售",
+    all_transactions: "所有交易", time: "时间", payment: "付款方式", void: "作废",
+    no_transactions: "暂无交易", no_products_cat: "该分类下无产品",
+    products: "产品", modifiers_header: "附加项", categories: "分类",
+    add_product: "添加产品", add_modifier: "添加附加项", add_category: "添加分类",
+    edit_product: "编辑产品", edit_modifier: "编辑附加项", edit_category: "编辑分类",
+    name: "名称", price_label: "价格 (฿)", category: "分类",
+    image: "图片", no_image: "无图片", upload_image: "上传", remove_image: "移除",
+    save: "保存", cancel: "取消", done: "完成",
+    payment_complete: "付款完成", sale_recorded: "销售记录成功", thank_you: "谢谢！", new_order: "新订单",
+    warning_unsaved: "⚠ 您有未导出的销售记录，请从销售标签导出 CSV 以保留记录",
+    confirm_clear: "清除当前订单？",
+    confirm_void: "作废此交易？将从今日销售中移除。",
+    confirm_reset: "重置今日销售？此操作无法撤销。如需保留记录请先导出 CSV。",
+    confirm_del_product: "删除此产品？",
+    confirm_del_modifier: "删除此附加项？",
+    confirm_del_category: "删除此分类？",
+    cat_has_products: "请先移除或重新分配此分类下的产品。",
+    toast_no_sales_export: "暂无销售可导出", toast_no_sales_print: "暂无销售可打印",
+    toast_no_sales_reset: "暂无销售可重置", toast_cat_exists: "分类已存在",
+    toast_name_req: "请输入名称 (EN)", toast_price_req: "请输入有效价格",
+    toast_csv_exported: "CSV 已导出", toast_day_reset: "今日已重置",
+    toast_voided: "交易已作废", toast_product_added: "产品已添加",
+    toast_product_updated: "产品已更新", toast_modifier_added: "附加项已添加",
+    toast_modifier_updated: "附加项已更新", toast_category_added: "分类已添加",
+    toast_category_updated: "分类已更新",
+    toast_midnight: "新的一天开始 — 昨日销售已自动导出",
+    toast_image_too_large: "图片过大 — 请使用较小的照片",
+    modifiers_for: "附加项 —",
+    prev_day_detected: "检测到上一天销售",
+    prev_day_msg: "发现上一天的销售记录。重置今日前导出？",
+    export_and_reset: "导出并重置", discard: "丢弃",
+    uncategorized: "未分类",
+    new_customer_orders: "新订单", customer_orders: "顾客订单"
+  }
+};
+let lang = "en";
+const t = k => (T[lang] && T[lang][k]) || T.en[k] || k;
+const getName = obj => obj ? (obj["name_" + lang] || obj.name_en || obj.name_th || obj.name_zh || obj.name || "") : "";
+
+// ========== DEFAULT DATA ==========
+const DEFAULT_CATEGORIES = [
+  { id: "c1", name_en: "Espresso", name_th: "เอสเพรสโซ่", name_zh: "浓缩咖啡" },
+  { id: "c2", name_en: "Brewed",   name_th: "กาแฟดริป",   name_zh: "手冲咖啡" },
+  { id: "c3", name_en: "Tea",      name_th: "ชา",          name_zh: "茶" },
+  { id: "c4", name_en: "Cold",     name_th: "เครื่องดื่มเย็น", name_zh: "冷饮" },
+  { id: "c5", name_en: "Pastries", name_th: "ขนม",         name_zh: "糕点" }
+];
+const DEFAULT_PRODUCTS = [
+  { id: "p1",  name_en: "Espresso",        name_th: "เอสเพรสโซ่",      name_zh: "浓缩咖啡",     price: 55, cat: "c1" },
+  { id: "p2",  name_en: "Double Espresso", name_th: "เอสเพรสโซ่คู่",    name_zh: "双份浓缩",     price: 70, cat: "c1" },
+  { id: "p3",  name_en: "Americano",       name_th: "อเมริกาโน่",      name_zh: "美式咖啡",     price: 60, cat: "c1" },
+  { id: "p4",  name_en: "Latte",           name_th: "ลาเต้",           name_zh: "拿铁",         price: 75, cat: "c1" },
+  { id: "p5",  name_en: "Cappuccino",      name_th: "คาปูชิโน่",        name_zh: "卡布奇诺",     price: 75, cat: "c1" },
+  { id: "p6",  name_en: "Mocha",           name_th: "มอคค่า",          name_zh: "摩卡",         price: 85, cat: "c1" },
+  { id: "p7",  name_en: "Macchiato",       name_th: "มัคคิอาโต้",       name_zh: "玛奇朵",       price: 70, cat: "c1" },
+  { id: "p8",  name_en: "Flat White",      name_th: "แฟลตไวท์",        name_zh: "馥芮白",       price: 80, cat: "c1" },
+  { id: "p9",  name_en: "Drip Coffee",     name_th: "กาแฟดริป",        name_zh: "手冲咖啡",     price: 50, cat: "c2" },
+  { id: "p10", name_en: "Pour Over",       name_th: "กาแฟเทสด",        name_zh: "手滴咖啡",     price: 90, cat: "c2" },
+  { id: "p11", name_en: "French Press",    name_th: "เฟรนช์เพรส",       name_zh: "法压壶",       price: 80, cat: "c2" },
+  { id: "p12", name_en: "Earl Grey",       name_th: "ชาเอิร์ลเกรย์",     name_zh: "伯爵茶",       price: 55, cat: "c3" },
+  { id: "p13", name_en: "Green Tea",       name_th: "ชาเขียว",         name_zh: "绿茶",         price: 55, cat: "c3" },
+  { id: "p14", name_en: "Chai Latte",      name_th: "ชาลาเต้",         name_zh: "印度奶茶",     price: 80, cat: "c3" },
+  { id: "p15", name_en: "Matcha Latte",    name_th: "มัทฉะลาเต้",       name_zh: "抹茶拿铁",     price: 90, cat: "c3" },
+  { id: "p16", name_en: "Cold Brew",       name_th: "โคลด์บริว",        name_zh: "冷萃咖啡",     price: 75, cat: "c4" },
+  { id: "p17", name_en: "Iced Latte",      name_th: "ลาเต้เย็น",        name_zh: "冰拿铁",       price: 85, cat: "c4" },
+  { id: "p18", name_en: "Iced Americano",  name_th: "อเมริกาโน่เย็น",   name_zh: "冰美式",       price: 65, cat: "c4" },
+  { id: "p19", name_en: "Croissant",       name_th: "ครัวซองต์",        name_zh: "牛角包",       price: 55, cat: "c5" },
+  { id: "p20", name_en: "Blueberry Muffin",name_th: "มัฟฟินบลูเบอร์รี่", name_zh: "蓝莓玛芬",     price: 55, cat: "c5" },
+  { id: "p21", name_en: "Chocolate Chip Cookie", name_th: "คุกกี้ช็อกโกแลตชิพ", name_zh: "巧克力曲奇", price: 45, cat: "c5" },
+  { id: "p22", name_en: "Scone",           name_th: "สโคน",            name_zh: "司康",         price: 55, cat: "c5" },
+  { id: "p23", name_en: "Bagel",           name_th: "เบเกิล",          name_zh: "贝果",         price: 50, cat: "c5" },
+  { id: "p24", name_en: "Banana Bread",    name_th: "บานาน่าเบรด",      name_zh: "香蕉面包",     price: 55, cat: "c5" }
+];
+const DEFAULT_ADDONS = [
+  { id: "a1",  name_en: "Extra Shot",     name_th: "ช็อตพิเศษ",          name_zh: "加份",       price: 15 },
+  { id: "a2",  name_en: "Decaf",          name_th: "ดีแคฟ",              name_zh: "低因",       price: 0 },
+  { id: "a3",  name_en: "Oat Milk",       name_th: "นมโอ๊ต",             name_zh: "燕麦奶",     price: 20 },
+  { id: "a4",  name_en: "Almond Milk",    name_th: "นมอัลมอนด์",         name_zh: "杏仁奶",     price: 20 },
+  { id: "a5",  name_en: "Soy Milk",       name_th: "นมถั่วเหลือง",        name_zh: "豆奶",       price: 15 },
+  { id: "a6",  name_en: "Vanilla Syrup",  name_th: "ไซรัปวานิลลา",        name_zh: "香草糖浆",   price: 10 },
+  { id: "a7",  name_en: "Caramel Syrup",  name_th: "ไซรัปคาราเมล",        name_zh: "焦糖糖浆",   price: 10 },
+  { id: "a8",  name_en: "Hazelnut Syrup", name_th: "ไซรัปเฮเซลนัท",       name_zh: "榛果糖浆",   price: 10 },
+  { id: "a9",  name_en: "Whipped Cream",  name_th: "วิปครีม",             name_zh: "鲜奶油",     price: 10 },
+  { id: "a10", name_en: "Extra Hot",      name_th: "ร้อนพิเศษ",           name_zh: "加热",       price: 0 }
+];
+
+// ========== STATE ==========
+let categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+let products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+let addons = JSON.parse(JSON.stringify(DEFAULT_ADDONS));
+let transactions = [];
+let cart = [];
+let activeCat = "c1";
+let editingLineId = null, editingProductId = null, editingAddonId = null, editingCategoryId = null;
+let prodImageData = null;
+let pendingOldDay = null;
+
+function dateKey(d) { return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+let currentDateKey = dateKey(new Date());
+
+// ========== STORAGE ==========
+const KEY_MENU = "coffee_pos_menu_v2";
+const KEY_DAY  = "coffee_pos_day_v2";
+const KEY_LANG = "coffee_pos_lang_v2";
+
+function saveMenu() {
+  try { localStorage.setItem(KEY_MENU, JSON.stringify({ products, addons, categories })); } catch(e) { console.error(e); }
+  // push to Firebase for cross-device sync
+  if (window.cloud && window.cloud.pushMenu) window.cloud.pushMenu();
+}
+function saveDay() {
+  try { localStorage.setItem(KEY_DAY, JSON.stringify({ transactions, currentDateKey })); } catch(e) {
+    if (e.name === 'QuotaExceededError') toast(t("toast_image_too_large"));
+    console.error(e);
+  }
+}
+function saveLang() { try { localStorage.setItem(KEY_LANG, lang); } catch(e) {} }
+
+function loadState() {
+  try {
+    const menuRaw = localStorage.getItem(KEY_MENU);
+    if (menuRaw) {
+      const m = JSON.parse(menuRaw);
+      if (m.products && Array.isArray(m.products)) products = m.products;
+      if (m.addons && Array.isArray(m.addons)) addons = m.addons;
+      if (m.categories && Array.isArray(m.categories) && m.categories.length > 0) categories = m.categories;
+    }
+    const dayRaw = localStorage.getItem(KEY_DAY);
+    if (dayRaw) {
+      const d = JSON.parse(dayRaw);
+      const today = dateKey(new Date());
+      if (d.currentDateKey === today) {
+        transactions = d.transactions || [];
+        currentDateKey = today;
+      } else if (d.transactions && d.transactions.length > 0) {
+        pendingOldDay = d;
+      } else {
+        currentDateKey = today;
+      }
+    }
+    const l = localStorage.getItem(KEY_LANG);
+    if (l && T[l]) lang = l;
+    if (categories.length > 0) activeCat = categories[0].id;
+  } catch(e) { console.error("Load error", e); }
+}
+
+// ========== HELPERS ==========
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const fmt = n => "฿" + (n % 1 === 0 ? n.toFixed(0) : n.toFixed(2));
+const uid = () => Math.random().toString(36).slice(2, 10);
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg) {
+  const el = $("#toast"); el.textContent = msg; el.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), 2000);
+}
+function updateWarning() { $("#warningBar").style.display = transactions.length > 0 ? "block" : "none"; }
+
+// ========== IMAGE RESIZING ==========
+function resizeImage(file, maxSize, quality, callback) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      try { callback(canvas.toDataURL("image/jpeg", quality)); }
+      catch(err) { toast(t("toast_image_too_large")); }
+    };
+    img.onerror = () => toast(t("toast_image_too_large"));
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ========== LANGUAGE ==========
+function setLang(newLang) {
+  lang = newLang;
+  saveLang();
+  document.documentElement.lang = lang;
+  $$(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
+  $$("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  $("#warningBar").textContent = t("warning_unsaved");
+  renderCategories(); renderProducts(); renderCart();
+  if ($("#reportView").classList.contains("active")) renderReport();
+  if ($("#menuView").classList.contains("active")) renderMenuEditor();
+}
+$$(".lang-btn").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
+
+// ========== NAV ==========
+$$(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    $$(".tab").forEach(t => t.classList.remove("active"));
+    $$(".view").forEach(v => v.classList.remove("active"));
+    tab.classList.add("active");
+    $("#" + tab.dataset.view).classList.add("active");
+    if (tab.dataset.view === "reportView") renderReport();
+    if (tab.dataset.view === "menuView") renderMenuEditor();
+  });
+});
+
+// ========== CLOCK + MIDNIGHT RESET ==========
+function tickClock() {
+  const d = new Date();
+  $("#clock").textContent = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  const k = dateKey(d);
+  if (k !== currentDateKey) {
+    if (transactions.length > 0) {
+      try { exportCSV(true); } catch(e) {}
+      transactions = [];
+      if ($("#reportView").classList.contains("active")) renderReport();
+      toast(t("toast_midnight"));
+    }
+    currentDateKey = k;
+    saveDay();
+    updateWarning();
+  }
+}
+setInterval(tickClock, 15000); tickClock();
+
+// ========== MENU RENDER ==========
+function renderCategories() {
+  $("#cats").innerHTML = categories.map(c =>
+    `<button class="cat ${c.id === activeCat ? 'active' : ''}" data-id="${c.id}">${escapeHtml(getName(c))}</button>`
+  ).join("");
+  $$(".cat").forEach(b => b.addEventListener("click", () => { activeCat = b.dataset.id; renderCategories(); renderProducts(); }));
+}
+function renderProducts() {
+  const list = products.filter(p => p.cat === activeCat);
+  if (list.length === 0) {
+    $("#products").innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#a08b78;padding:40px;">${t("no_products_cat")}</div>`;
+    return;
+  }
+  $("#products").innerHTML = list.map(p =>
+    `<button class="product" data-id="${p.id}">
+      ${p.image ? `<img src="${p.image}" alt="">` : ""}
+      <div class="name">${escapeHtml(getName(p))}</div>
+      <div class="price">${fmt(p.price)}</div>
+    </button>`
+  ).join("");
+  $$(".product").forEach(b => b.addEventListener("click", () => addToCart(b.dataset.id)));
+}
+
+// ========== CART ==========
+function addToCart(productId) {
+  const p = products.find(x => x.id === productId);
+  if (!p) return;
+  cart.push({ lineId: uid(), productId: p.id, name: getName(p), cat: p.cat, price: p.price, qty: 1, addons: [] });
+  renderCart();
+}
+function clearCart() { if (cart.length === 0) return; if (confirm(t("confirm_clear"))) { cart = []; renderCart(); } }
+function changeQty(lineId, delta) {
+  const it = cart.find(i => i.lineId === lineId); if (!it) return;
+  it.qty += delta; if (it.qty <= 0) cart = cart.filter(i => i.lineId !== lineId);
+  renderCart();
+}
+function removeLine(lineId) { cart = cart.filter(i => i.lineId !== lineId); renderCart(); }
+function lineTotal(item) { return (item.price + item.addons.reduce((s,a) => s+a.price, 0)) * item.qty; }
+function cartTotal() { return cart.reduce((s, i) => s + lineTotal(i), 0); }
+function cartCount() { return cart.reduce((s, i) => s + i.qty, 0); }
+
+function renderCart() {
+  const el = $("#cartItems");
+  if (cart.length === 0) {
+    el.innerHTML = `<div class="cart-empty">${t("tap_to_start")}</div>`;
+  } else {
+    el.innerHTML = cart.map(i => {
+      const aText = i.addons.length > 0 ? i.addons.map(a => `+ ${escapeHtml(a.name)}${a.price > 0 ? " (" + fmt(a.price) + ")" : ""}`).join(", ") : "";
+      return `<div class="cart-item">
+        <div class="cart-item-top">
+          <div class="cart-item-name">${escapeHtml(i.name)}</div>
+          <div class="cart-item-price">${fmt(lineTotal(i))}</div>
+        </div>
+        ${aText ? `<div class="cart-item-addons">${aText}</div>` : ""}
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="changeQty('${i.lineId}',-1)">−</button>
+          <div class="qty-val">${i.qty}</div>
+          <button class="qty-btn" onclick="changeQty('${i.lineId}',1)">+</button>
+          <button class="add-addon" onclick="openAddonModal('${i.lineId}')">${t("modifiers")}</button>
+          <button class="remove-item" onclick="removeLine('${i.lineId}')">${t("remove")}</button>
+        </div>
+      </div>`;
+    }).join("");
+  }
+  const tot = cartTotal();
+  $("#subtotal").textContent = fmt(tot);
+  $("#total").textContent = fmt(tot);
+  $("#itemCount").textContent = cartCount();
+  $("#btnCash").disabled = cart.length === 0;
+  $("#btnMobile").disabled = cart.length === 0;
+}
+
+// ========== ADD-ON MODAL ==========
+function openAddonModal(lineId) {
+  editingLineId = lineId;
+  const it = cart.find(i => i.lineId === lineId);
+  $("#addonModalTitle").textContent = t("modifiers_for") + " " + it.name;
+  renderAddonGrid();
+  $("#addonModal").classList.add("active");
+}
+function closeAddonModal() { $("#addonModal").classList.remove("active"); editingLineId = null; }
+function renderAddonGrid() {
+  const it = cart.find(i => i.lineId === editingLineId);
+  const sel = new Set(it.addons.map(a => a.id));
+  $("#addonGrid").innerHTML = addons.map(a =>
+    `<button class="addon-option ${sel.has(a.id) ? 'selected' : ''}" data-id="${a.id}">
+      <span>${escapeHtml(getName(a))}</span><span class="apr">${a.price > 0 ? "+" + fmt(a.price) : t("free")}</span>
+    </button>`
+  ).join("");
+  $$("#addonGrid .addon-option").forEach(b => b.addEventListener("click", () => b.classList.toggle("selected")));
+}
+function saveAddons() {
+  const it = cart.find(i => i.lineId === editingLineId);
+  const sel = Array.from($$("#addonGrid .addon-option.selected")).map(b => b.dataset.id);
+  it.addons = addons.filter(a => sel.includes(a.id)).map(a => ({ id: a.id, name: getName(a), price: a.price }));
+  closeAddonModal(); renderCart();
+}
+
+// ========== PAYMENT ==========
+function payWith(method) {
+  if (cart.length === 0) return;
+  const total = cartTotal();
+  const txn = {
+    id: uid(), time: new Date().toISOString(),
+    items: cart.map(i => ({ name: i.name, cat: i.cat, qty: i.qty, price: i.price, addons: i.addons.map(a => ({ name: a.name, price: a.price })), lineTotal: lineTotal(i) })),
+    total, payment: method
+  };
+  transactions.push(txn);
+  // push to cloud for cross-device reporting
+  if (window.cloud && window.cloud.pushSale) window.cloud.pushSale(txn);
+  cart = []; renderCart(); updateWarning(); saveDay();
+  $("#confirmAmount").textContent = fmt(total);
+  $("#confirmMethod").textContent = (method === "Cash" ? t("cash") : t("mobile_pay")) + " — " + t("thank_you");
+  $("#confirmModal").classList.add("active");
+}
+function closeConfirm() { $("#confirmModal").classList.remove("active"); }
+
+// ========== REPORT ==========
+function renderReport() {
+  const d = new Date();
+  const locale = lang === "th" ? "th-TH" : (lang === "zh" ? "zh-CN" : undefined);
+  $("#reportDate").textContent = d.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  const totalRev = transactions.reduce((s, tx) => s + tx.total, 0);
+  const totalItems = transactions.reduce((s, tx) => s + tx.items.reduce((x, i) => x + i.qty, 0), 0);
+  const cashRev = transactions.filter(tx => tx.payment === "Cash").reduce((s, tx) => s + tx.total, 0);
+  const mobileRev = transactions.filter(tx => tx.payment === "Mobile").reduce((s, tx) => s + tx.total, 0);
+  const avgSale = transactions.length > 0 ? totalRev / transactions.length : 0;
+
+  $("#summaryGrid").innerHTML = `
+    <div class="summary-card"><div class="label">${t("revenue")}</div><div class="value">${fmt(totalRev)}</div><div class="sub">${transactions.length} ${t("transactions")}</div></div>
+    <div class="summary-card"><div class="label">${t("items_sold")}</div><div class="value">${totalItems}</div><div class="sub">${t("avg_sale")} ${fmt(avgSale)}</div></div>
+    <div class="summary-card"><div class="label">${t("cash")}</div><div class="value">${fmt(cashRev)}</div><div class="sub">${transactions.filter(tx => tx.payment === "Cash").length} ${t("sales_count")}</div></div>
+    <div class="summary-card"><div class="label">${t("mobile_pay")}</div><div class="value">${fmt(mobileRev)}</div><div class="sub">${transactions.filter(tx => tx.payment === "Mobile").length} ${t("sales_count")}</div></div>
+  `;
+
+  // Sales by category
+  const byCat = {};
+  transactions.forEach(tx => tx.items.forEach(i => {
+    const cid = i.cat || "__uncat";
+    if (!byCat[cid]) byCat[cid] = { qty: 0, rev: 0 };
+    byCat[cid].qty += i.qty; byCat[cid].rev += i.lineTotal;
+  }));
+  const catRows = Object.entries(byCat).map(([cid, d]) => {
+    const c = categories.find(x => x.id === cid);
+    return { name: c ? getName(c) : t("uncategorized"), qty: d.qty, rev: d.rev };
+  }).sort((a, b) => b.rev - a.rev);
+  const maxCatRev = Math.max(1, ...catRows.map(r => r.rev));
+  if (catRows.length === 0) {
+    $("#catSalesList").innerHTML = `<div style="color:#a08b78;font-size:14px;">${t("no_sales_today")}</div>`;
+  } else {
+    $("#catSalesList").innerHTML = catRows.map(r => {
+      const pct = Math.round((r.rev / maxCatRev) * 100);
+      return `<div class="cat-bar">
+        <div class="cat-bar-fill" style="width:${pct}%;"></div>
+        <div class="cat-bar-content">
+          <span class="cat-bar-name">${escapeHtml(r.name)}</span>
+          <span class="cat-bar-stats">${r.qty} × · ${fmt(r.rev)}</span>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  // Top products
+  const byProduct = {};
+  transactions.forEach(tx => tx.items.forEach(i => {
+    if (!byProduct[i.name]) byProduct[i.name] = { qty: 0, rev: 0 };
+    byProduct[i.name].qty += i.qty; byProduct[i.name].rev += i.lineTotal;
+  }));
+  const sorted = Object.entries(byProduct).sort((a, b) => b[1].qty - a[1].qty);
+  if (sorted.length === 0) {
+    $("#topList").innerHTML = `<div style="color:#a08b78;font-size:14px;">${t("no_sales_today")}</div>`;
+  } else {
+    $("#topList").innerHTML = sorted.slice(0, 12).map(([n, d]) =>
+      `<div class="top-row"><span>${escapeHtml(n)}</span><span class="qty">${d.qty} × — ${fmt(d.rev)}</span></div>`
+    ).join("");
+  }
+
+  const body = $("#txnBody");
+  if (transactions.length === 0) {
+    body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#a08b78;padding:20px;">${t("no_transactions")}</td></tr>`;
+  } else {
+    body.innerHTML = transactions.slice().reverse().map(tx => {
+      const tm = new Date(tx.time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const itemsText = tx.items.map(i => `${i.qty}× ${escapeHtml(i.name)}${i.addons.length > 0 ? " (" + i.addons.map(a => escapeHtml(a.name)).join(", ") + ")" : ""}`).join(", ");
+      const payLabel = tx.payment === "Cash" ? t("cash") : t("mobile_pay");
+      return `<tr>
+        <td>${tm}</td>
+        <td><div class="txn-items">${itemsText}</div></td>
+        <td>${payLabel}</td>
+        <td style="text-align:right;font-weight:600;">${fmt(tx.total)}</td>
+        <td><button class="void-btn" onclick="voidTxn('${tx.id}')">${t("void")}</button></td>
+      </tr>`;
+    }).join("");
+  }
+}
+function voidTxn(id) {
+  if (!confirm(t("confirm_void"))) return;
+  transactions = transactions.filter(tx => tx.id !== id);
+  saveDay(); renderReport(); updateWarning(); toast(t("toast_voided"));
+}
+function resetDay() {
+  if (transactions.length === 0) { toast(t("toast_no_sales_reset")); return; }
+  if (!confirm(t("confirm_reset"))) return;
+  transactions = []; saveDay(); renderReport(); updateWarning(); toast(t("toast_day_reset"));
+}
+
+// ========== CSV EXPORT (accepts optional txn set + date key) ==========
+function buildCSV(txns, dateK) {
+  const rows = [["Transaction ID", "Date", "Time", "Item", "Category", "Quantity", "Unit Price", "Add-ons", "Add-on Total", "Line Total", "Payment", "Transaction Total"]];
+  txns.forEach(tx => {
+    const dt = new Date(tx.time);
+    const date = dt.toLocaleDateString(); const time = dt.toLocaleTimeString();
+    tx.items.forEach(i => {
+      const addonNames = i.addons.map(a => a.name).join("; ");
+      const addonSum = i.addons.reduce((s, a) => s + a.price, 0);
+      const c = categories.find(x => x.id === i.cat);
+      const catName = c ? (c.name_en || getName(c)) : "";
+      rows.push([tx.id, date, time, i.name, catName, i.qty, i.price.toFixed(2), addonNames, addonSum.toFixed(2), i.lineTotal.toFixed(2), tx.payment, tx.total.toFixed(2)]);
+    });
+  });
+  rows.push([]); rows.push(["SUMMARY"]);
+  rows.push(["Total Revenue", txns.reduce((s, tx) => s + tx.total, 0).toFixed(2)]);
+  rows.push(["Total Transactions", txns.length]);
+  rows.push(["Cash Total", txns.filter(tx => tx.payment === "Cash").reduce((s, tx) => s + tx.total, 0).toFixed(2)]);
+  rows.push(["Mobile Pay Total", txns.filter(tx => tx.payment === "Mobile").reduce((s, tx) => s + tx.total, 0).toFixed(2)]);
+
+  rows.push([]); rows.push(["SALES BY CATEGORY"]); rows.push(["Category", "Quantity", "Revenue"]);
+  const byC = {};
+  txns.forEach(tx => tx.items.forEach(i => {
+    const cid = i.cat || "__uncat";
+    if (!byC[cid]) byC[cid] = { qty: 0, rev: 0 };
+    byC[cid].qty += i.qty; byC[cid].rev += i.lineTotal;
+  }));
+  Object.entries(byC).sort((a,b)=>b[1].rev-a[1].rev).forEach(([cid, d]) => {
+    const c = categories.find(x => x.id === cid);
+    rows.push([c ? (c.name_en || getName(c)) : "Uncategorized", d.qty, d.rev.toFixed(2)]);
+  });
+
+  rows.push([]); rows.push(["PRODUCT BREAKDOWN"]); rows.push(["Product", "Quantity Sold", "Revenue"]);
+  const byP = {};
+  txns.forEach(tx => tx.items.forEach(i => {
+    if (!byP[i.name]) byP[i.name] = { qty: 0, rev: 0 };
+    byP[i.name].qty += i.qty; byP[i.name].rev += i.lineTotal;
+  }));
+  Object.entries(byP).sort((a, b) => b[1].qty - a[1].qty).forEach(([n, d]) => rows.push([n, d.qty, d.rev.toFixed(2)]));
+
+  return "\uFEFF" + rows.map(r => r.map(c => {
+    const s = String(c ?? "");
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }).join(",")).join("\n");
+}
+function downloadCSV(csv, dateK) {
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `coffee-sales-${dateK}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function exportCSV(silent) {
+  if (transactions.length === 0) { if (!silent) toast(t("toast_no_sales_export")); return; }
+  downloadCSV(buildCSV(transactions, currentDateKey), currentDateKey);
+  if (!silent) toast(t("toast_csv_exported"));
+}
+
+// ========== PRINT ==========
+function printReport() {
+  if (transactions.length === 0) { toast(t("toast_no_sales_print")); return; }
+  const w = window.open("", "_blank");
+  const totalRev = transactions.reduce((s, tx) => s + tx.total, 0);
+  const cashRev = transactions.filter(tx => tx.payment === "Cash").reduce((s, tx) => s + tx.total, 0);
+  const mobileRev = transactions.filter(tx => tx.payment === "Mobile").reduce((s, tx) => s + tx.total, 0);
+  const byCat = {};
+  transactions.forEach(tx => tx.items.forEach(i => {
+    const cid = i.cat || "__uncat";
+    if (!byCat[cid]) byCat[cid] = { qty: 0, rev: 0 };
+    byCat[cid].qty += i.qty; byCat[cid].rev += i.lineTotal;
+  }));
+  const catRows = Object.entries(byCat).map(([cid, d]) => {
+    const c = categories.find(x => x.id === cid);
+    return { name: c ? getName(c) : t("uncategorized"), qty: d.qty, rev: d.rev };
+  }).sort((a, b) => b.rev - a.rev);
+  const byP = {};
+  transactions.forEach(tx => tx.items.forEach(i => {
+    if (!byP[i.name]) byP[i.name] = { qty: 0, rev: 0 };
+    byP[i.name].qty += i.qty; byP[i.name].rev += i.lineTotal;
+  }));
+  const sorted = Object.entries(byP).sort((a, b) => b[1].qty - a[1].qty);
+  const locale = lang === "th" ? "th-TH" : (lang === "zh" ? "zh-CN" : undefined);
+  const date = new Date().toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  w.document.write(`<html><head><title>${t("todays_sales")} — ${date}</title>
+  <style>body{font-family:-apple-system,"Noto Sans Thai","Noto Sans SC",sans-serif;padding:20px;max-width:720px;margin:auto;} h1{border-bottom:2px solid #333;padding-bottom:8px;} table{width:100%;border-collapse:collapse;margin:10px 0;} td,th{border-bottom:1px solid #ddd;padding:6px;text-align:left;} .num{text-align:right;} h3{margin-top:20px;}</style>
+  </head><body>
+  <h1>☕ ${t("todays_sales")}</h1><p>${date}</p>
+  <table><tr><td>${t("revenue")}</td><td class="num"><b>${fmt(totalRev)}</b></td></tr>
+  <tr><td>${t("transactions")}</td><td class="num">${transactions.length}</td></tr>
+  <tr><td>${t("cash")}</td><td class="num">${fmt(cashRev)}</td></tr>
+  <tr><td>${t("mobile_pay")}</td><td class="num">${fmt(mobileRev)}</td></tr></table>
+  <h3>${t("sales_by_category")}</h3>
+  <table><tr><th>${t("category")}</th><th class="num">${t("items")}</th><th class="num">${t("revenue")}</th></tr>
+  ${catRows.map(r => `<tr><td>${escapeHtml(r.name)}</td><td class="num">${r.qty}</td><td class="num">${fmt(r.rev)}</td></tr>`).join("")}
+  </table>
+  <h3>${t("top_sellers")}</h3>
+  <table><tr><th>${t("name")}</th><th class="num">${t("items")}</th><th class="num">${t("revenue")}</th></tr>
+  ${sorted.map(([n, d]) => `<tr><td>${escapeHtml(n)}</td><td class="num">${d.qty}</td><td class="num">${fmt(d.rev)}</td></tr>`).join("")}
+  </table></body></html>`);
+  w.document.close(); w.focus(); setTimeout(() => w.print(), 300);
+}
+
+// ========== MENU EDITOR ==========
+function renderMenuEditor() {
+  const grouped = {}; categories.forEach(c => grouped[c.id] = []);
+  products.forEach(p => { if (!grouped[p.cat]) grouped[p.cat] = []; grouped[p.cat].push(p); });
+  $("#productEditor").innerHTML = categories.map(c => `
+    <div style="margin-bottom:16px;">
+      <div style="font-weight:600;color:#7a5f47;margin-bottom:6px;font-size:13px;text-transform:uppercase;">${escapeHtml(getName(c))}</div>
+      <div class="editor-list">
+        ${grouped[c.id].length === 0 ? '<div style="color:#a08b78;font-size:13px;padding:8px;">—</div>' :
+          grouped[c.id].map(p => `<div class="editor-item">
+            ${p.image ? `<img src="${p.image}" alt="">` : '<div style="width:42px;height:42px;border-radius:6px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#d9cbb5;font-size:18px;">☕</div>'}
+            <div class="ename">${escapeHtml(getName(p))}</div>
+            <div class="eprice">${fmt(p.price)}</div>
+            <button class="icon-btn" onclick="openProductEditor('${p.id}')">✎</button>
+            <button class="icon-btn del" onclick="deleteProduct('${p.id}')">🗑</button>
+          </div>`).join("")}
+      </div>
+    </div>`).join("");
+
+  $("#addonEditor").innerHTML = addons.map(a => `<div class="editor-item">
+      <div class="ename">${escapeHtml(getName(a))}</div>
+      <div class="eprice">${a.price > 0 ? "+" + fmt(a.price) : t("free")}</div>
+      <button class="icon-btn" onclick="openAddonEditor('${a.id}')">✎</button>
+      <button class="icon-btn del" onclick="deleteAddon('${a.id}')">🗑</button>
+    </div>`).join("");
+
+  $("#catEditor").innerHTML = categories.map(c => `<div class="editor-item">
+      <div class="ename">${escapeHtml(getName(c))}</div>
+      <button class="icon-btn" onclick="openCategoryEditor('${c.id}')">✎</button>
+      <button class="icon-btn del" onclick="deleteCategory('${c.id}')">🗑</button>
+    </div>`).join("");
+}
+
+// ---- Product editor ----
+function showProdImagePreview() {
+  const wrap = $("#prodImagePreview");
+  if (prodImageData) {
+    wrap.innerHTML = `<img src="${prodImageData}" alt="">`;
+  } else {
+    wrap.innerHTML = `<span>${t("no_image")}</span>`;
+  }
+}
+function removeProdImage() { prodImageData = null; showProdImagePreview(); }
+$("#prodImageInput").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  resizeImage(file, 240, 0.82, dataUrl => { prodImageData = dataUrl; showProdImagePreview(); });
+  e.target.value = "";
+});
+
+function openProductEditor(id) {
+  editingProductId = id || null;
+  $("#productModalTitle").textContent = id ? t("edit_product") : t("add_product");
+  $("#prodCat").innerHTML = categories.map(c => `<option value="${c.id}">${escapeHtml(getName(c))}</option>`).join("");
+  if (id) {
+    const p = products.find(x => x.id === id);
+    $("#prodNameEn").value = p.name_en || p.name || "";
+    $("#prodNameTh").value = p.name_th || "";
+    $("#prodNameZh").value = p.name_zh || "";
+    $("#prodPrice").value = p.price;
+    $("#prodCat").value = p.cat;
+    prodImageData = p.image || null;
+  } else {
+    $("#prodNameEn").value = ""; $("#prodNameTh").value = ""; $("#prodNameZh").value = "";
+    $("#prodPrice").value = "";
+    $("#prodCat").value = categories[0] ? categories[0].id : "";
+    prodImageData = null;
+  }
+  showProdImagePreview();
+  $("#productModal").classList.add("active");
+}
+function closeProductModal() { $("#productModal").classList.remove("active"); editingProductId = null; prodImageData = null; }
+function saveProduct() {
+  const name_en = $("#prodNameEn").value.trim();
+  const name_th = $("#prodNameTh").value.trim();
+  const name_zh = $("#prodNameZh").value.trim();
+  const price = parseFloat($("#prodPrice").value);
+  const cat = $("#prodCat").value;
+  if (!name_en) { toast(t("toast_name_req")); return; }
+  if (isNaN(price) || price < 0) { toast(t("toast_price_req")); return; }
+  if (editingProductId) {
+    const p = products.find(x => x.id === editingProductId);
+    p.name_en = name_en; p.name_th = name_th; p.name_zh = name_zh;
+    p.price = price; p.cat = cat; p.image = prodImageData || null;
+    delete p.name;
+  } else {
+    products.push({ id: uid(), name_en, name_th, name_zh, price, cat, image: prodImageData || null });
+  }
+  saveMenu();
+  closeProductModal(); renderMenuEditor(); renderCategories(); renderProducts();
+  toast(editingProductId ? t("toast_product_updated") : t("toast_product_added"));
+}
+function deleteProduct(id) {
+  if (!confirm(t("confirm_del_product"))) return;
+  products = products.filter(p => p.id !== id);
+  saveMenu(); renderMenuEditor(); renderProducts();
+}
+
+// ---- Addon editor ----
+function openAddonEditor(id) {
+  editingAddonId = id || null;
+  $("#addonEditorTitle").textContent = id ? t("edit_modifier") : t("add_modifier");
+  if (id) {
+    const a = addons.find(x => x.id === id);
+    $("#addonNameEn").value = a.name_en || a.name || "";
+    $("#addonNameTh").value = a.name_th || "";
+    $("#addonNameZh").value = a.name_zh || "";
+    $("#addonPrice").value = a.price;
+  } else {
+    $("#addonNameEn").value = ""; $("#addonNameTh").value = ""; $("#addonNameZh").value = "";
+    $("#addonPrice").value = "";
+  }
+  $("#addonEditorModal").classList.add("active");
+}
+function closeAddonEditorModal() { $("#addonEditorModal").classList.remove("active"); editingAddonId = null; }
+function saveAddon() {
+  const name_en = $("#addonNameEn").value.trim();
+  const name_th = $("#addonNameTh").value.trim();
+  const name_zh = $("#addonNameZh").value.trim();
+  const price = parseFloat($("#addonPrice").value);
+  if (!name_en) { toast(t("toast_name_req")); return; }
+  if (isNaN(price) || price < 0) { toast(t("toast_price_req")); return; }
+  if (editingAddonId) {
+    const a = addons.find(x => x.id === editingAddonId);
+    a.name_en = name_en; a.name_th = name_th; a.name_zh = name_zh; a.price = price;
+    delete a.name;
+  } else {
+    addons.push({ id: uid(), name_en, name_th, name_zh, price });
+  }
+  saveMenu();
+  closeAddonEditorModal(); renderMenuEditor();
+  toast(editingAddonId ? t("toast_modifier_updated") : t("toast_modifier_added"));
+}
+function deleteAddon(id) {
+  if (!confirm(t("confirm_del_modifier"))) return;
+  addons = addons.filter(a => a.id !== id); saveMenu(); renderMenuEditor();
+}
+
+// ---- Category editor ----
+function openCategoryEditor(id) {
+  editingCategoryId = id || null;
+  $("#categoryModalTitle").textContent = id ? t("edit_category") : t("add_category");
+  if (id) {
+    const c = categories.find(x => x.id === id);
+    $("#catNameEn").value = c.name_en || c.name || "";
+    $("#catNameTh").value = c.name_th || "";
+    $("#catNameZh").value = c.name_zh || "";
+  } else {
+    $("#catNameEn").value = ""; $("#catNameTh").value = ""; $("#catNameZh").value = "";
+  }
+  $("#categoryModal").classList.add("active");
+}
+function closeCategoryModal() { $("#categoryModal").classList.remove("active"); editingCategoryId = null; }
+function saveCategory() {
+  const name_en = $("#catNameEn").value.trim();
+  const name_th = $("#catNameTh").value.trim();
+  const name_zh = $("#catNameZh").value.trim();
+  if (!name_en) { toast(t("toast_name_req")); return; }
+  if (editingCategoryId) {
+    const c = categories.find(x => x.id === editingCategoryId);
+    c.name_en = name_en; c.name_th = name_th; c.name_zh = name_zh;
+    delete c.name;
+  } else {
+    if (categories.some(c => (c.name_en || "").toLowerCase() === name_en.toLowerCase())) { toast(t("toast_cat_exists")); return; }
+    const nid = uid();
+    categories.push({ id: nid, name_en, name_th, name_zh });
+    if (!activeCat) activeCat = nid;
+  }
+  saveMenu();
+  closeCategoryModal(); renderMenuEditor(); renderCategories(); renderProducts();
+  toast(editingCategoryId ? t("toast_category_updated") : t("toast_category_added"));
+}
+function deleteCategory(id) {
+  if (products.some(p => p.cat === id)) { alert(t("cat_has_products")); return; }
+  if (!confirm(t("confirm_del_category"))) return;
+  categories = categories.filter(c => c.id !== id);
+  if (activeCat === id) activeCat = categories[0] ? categories[0].id : "";
+  saveMenu(); renderMenuEditor(); renderCategories(); renderProducts();
+}
+
+// ========== OLD DAY PROMPT ==========
+function showOldDayPrompt() {
+  if (!pendingOldDay || !pendingOldDay.transactions || pendingOldDay.transactions.length === 0) return;
+  const txns = pendingOldDay.transactions;
+  const total = txns.reduce((s, tx) => s + tx.total, 0);
+  $("#oldDaySummary").innerHTML = `<b>${pendingOldDay.currentDateKey}</b> — ${txns.length} ${t("transactions")}, ${fmt(total)}`;
+  $("#oldDayModal").classList.add("active");
+}
+function oldDayExport() {
+  if (!pendingOldDay) return;
+  downloadCSV(buildCSV(pendingOldDay.transactions, pendingOldDay.currentDateKey), pendingOldDay.currentDateKey);
+  pendingOldDay = null;
+  transactions = [];
+  currentDateKey = dateKey(new Date());
+  saveDay();
+  $("#oldDayModal").classList.remove("active");
+  updateWarning();
+  if ($("#reportView").classList.contains("active")) renderReport();
+  toast(t("toast_csv_exported"));
+}
+function oldDayDiscard() {
+  pendingOldDay = null;
+  transactions = [];
+  currentDateKey = dateKey(new Date());
+  saveDay();
+  $("#oldDayModal").classList.remove("active");
+  updateWarning();
+  if ($("#reportView").classList.contains("active")) renderReport();
+}
+
+window.addEventListener("beforeunload", (e) => {
+  // Data is saved in localStorage continuously, so no prompt needed.
+});
+
+// ========== INIT ==========
+loadState();
+setLang(lang);
+renderCart();
+updateWarning();
+if (pendingOldDay) setTimeout(showOldDayPrompt, 300);
+
+// ========== FIREBASE SYNC INIT ==========
+// Wait until the module script has finished loading Firebase, then start sync
+function __startCloud() { if (window.cloudInit) window.cloudInit(); }
+if (window.__fbReady) __startCloud(); else window.__afterLoad = __startCloud;
+</script>
+</body>
+</html>
