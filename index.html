@@ -11,7 +11,6 @@
   html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Thai", "Noto Sans SC", Roboto, sans-serif; background: #f3ede3; color: #2b2018; user-select: none; -webkit-user-select: none; }
   button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
   input, select, textarea { font-family: inherit; }
-
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #3e2a1f; color: #f3ede3; height: 56px; gap: 10px; }
   .brand { font-weight: 700; font-size: 18px; letter-spacing: 0.5px; white-space: nowrap; }
   .tabs { display: flex; gap: 6px; }
@@ -22,10 +21,8 @@
   .lang-btn { padding: 6px 10px; border-radius: 5px; font-size: 12px; font-weight: 600; color: #f3ede3; }
   .lang-btn.active { background: #c08552; color: #fff; }
   .clock { font-size: 13px; opacity: 0.8; min-width: 70px; text-align: right; }
-
   .view { display: none; height: calc(100% - 56px); }
   .view.active { display: flex; }
-
   #posView { flex-direction: row; }
   .menu-pane { flex: 1.4; display: flex; flex-direction: column; padding: 12px; overflow: hidden; }
   .cats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -37,7 +34,6 @@
   .product img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; margin-bottom: 6px; background: #f3ede3; }
   .product .name { font-weight: 600; font-size: 14px; line-height: 1.2; margin-bottom: 4px; }
   .product .price { font-size: 13px; color: #7a5f47; font-weight: 600; }
-
   .cart-pane { flex: 1; background: #fff; display: flex; flex-direction: column; border-left: 1px solid #e8dfd0; min-width: 320px; }
   .cart-header { padding: 14px 16px; border-bottom: 1px solid #e8dfd0; display: flex; justify-content: space-between; align-items: center; }
   .cart-header h2 { font-size: 17px; }
@@ -54,7 +50,6 @@
   .qty-val { min-width: 24px; text-align: center; font-weight: 600; }
   .add-addon { margin-left: auto; font-size: 12px; color: #c08552; font-weight: 600; padding: 6px 10px; border: 1px solid #c08552; border-radius: 14px; }
   .remove-item { font-size: 12px; color: #b54a3a; font-weight: 600; padding: 6px; }
-
   .cart-footer { border-top: 1px solid #e8dfd0; padding: 14px 16px; }
   .total-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 14px; }
   .total-row.grand { font-size: 20px; font-weight: 700; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e8dfd0; }
@@ -64,7 +59,6 @@
   .pay-mobile { background: #2c5282; }
   .pay-btn:active { opacity: 0.85; }
   .pay-btn:disabled { opacity: 0.4; }
-
   #reportView { padding: 20px; flex-direction: column; overflow-y: auto; }
   .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
   .report-header h1 { font-size: 22px; }
@@ -79,7 +73,6 @@
   .summary-card .label { font-size: 12px; text-transform: uppercase; color: #7a5f47; font-weight: 600; letter-spacing: 0.5px; }
   .summary-card .value { font-size: 24px; font-weight: 700; margin-top: 6px; color: #3e2a1f; }
   .summary-card .sub { font-size: 12px; color: #a08b78; margin-top: 2px; }
-
   .report-section { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e8dfd0; }
   .report-section h2 { font-size: 16px; margin-bottom: 12px; color: #3e2a1f; }
   .top-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
@@ -90,13 +83,11 @@
   .cat-bar-content { position: relative; display: flex; justify-content: space-between; font-size: 14px; }
   .cat-bar-name { font-weight: 600; }
   .cat-bar-stats { color: #7a5f47; font-weight: 600; }
-
   .txn-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .txn-table th, .txn-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #f3ede3; }
   .txn-table th { background: #f3ede3; font-weight: 600; position: sticky; top: 0; font-size: 12px; text-transform: uppercase; color: #7a5f47; }
   .txn-items { color: #7a5f47; font-size: 12px; }
   .void-btn { color: #b54a3a; font-size: 12px; font-weight: 600; padding: 4px 8px; }
-
   #menuView { padding: 20px; flex-direction: column; overflow-y: auto; }
   .menu-editor-section { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e8dfd0; }
   .menu-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
@@ -107,7 +98,6 @@
   .editor-item .eprice { font-weight: 600; color: #7a5f47; font-size: 13px; }
   .icon-btn { width: 32px; height: 32px; border-radius: 6px; background: #fff; font-size: 14px; flex-shrink: 0; }
   .icon-btn.del { color: #b54a3a; }
-
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
   .modal-overlay.active { display: flex; }
   .modal { background: #fff; border-radius: 14px; max-width: 520px; width: 100%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -116,12 +106,10 @@
   .modal-close { width: 36px; height: 36px; border-radius: 18px; background: #f3ede3; font-size: 20px; }
   .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
   .modal-footer { padding: 14px 16px; border-top: 1px solid #e8dfd0; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
-
   .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .addon-option { padding: 12px; border-radius: 8px; background: #f8f4ed; text-align: left; border: 2px solid transparent; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; }
   .addon-option.selected { border-color: #c08552; background: #fff; }
   .addon-option .apr { font-size: 12px; color: #7a5f47; }
-
   .form-group { margin-bottom: 12px; }
   .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #3e2a1f; }
   .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #d9cbb5; border-radius: 8px; font-size: 15px; background: #fff; }
@@ -129,23 +117,17 @@
   .name-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .name-grid .form-group { margin-bottom: 0; }
   @media (max-width: 500px) { .name-grid { grid-template-columns: 1fr; } }
-
   .image-picker { display: flex; gap: 12px; align-items: flex-start; }
   .image-preview { width: 90px; height: 90px; border-radius: 10px; background: #f3ede3; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; color: #a08b78; font-size: 11px; text-align: center; padding: 6px; border: 1px dashed #d9cbb5; }
   .image-preview img { width: 100%; height: 100%; object-fit: cover; }
   .image-buttons { display: flex; flex-direction: column; gap: 6px; flex: 1; }
-
   .confirm-msg { text-align: center; padding: 10px 0; }
   .confirm-msg .big { font-size: 28px; font-weight: 700; color: #4a7c59; margin: 10px 0; }
-
   .warning-bar { background: #fff4d6; color: #6b4a00; padding: 8px 16px; font-size: 13px; text-align: center; border-bottom: 1px solid #e6d9a8; }
-
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-thumb { background: #d9cbb5; border-radius: 4px; }
-
   .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #3e2a1f; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
   .toast.show { opacity: 1; }
-
   @media (max-width: 800px) {
     #posView { flex-direction: column; }
     .cart-pane { border-left: none; border-top: 1px solid #e8dfd0; min-width: 0; max-height: 45%; }
@@ -203,7 +185,6 @@
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <div class="brand">☕ <span data-i18n="brand">Coffee Shop POS</span></div>
   <div class="tabs">
@@ -221,9 +202,7 @@
     <div class="clock" id="clock"></div>
   </div>
 </div>
-
 <div class="warning-bar" id="warningBar" style="display:none;" data-i18n="warning_unsaved">⚠ You have unsaved sales. Export CSV from the Sales tab before closing.</div>
-
 <div id="posView" class="view active">
   <div class="menu-pane">
     <div class="cats" id="cats"></div>
@@ -246,7 +225,6 @@
     </div>
   </div>
 </div>
-
 <div id="reportView" class="view">
   <div class="report-header">
     <div>
@@ -278,7 +256,6 @@
     </div>
   </div>
 </div>
-
 <div id="ordersView" class="view" style="flex-direction:column;padding:20px;overflow-y:auto;">
   <div class="report-header">
     <div>
@@ -309,7 +286,6 @@
     <div class="editor-list" id="catEditor"></div>
   </div>
 </div>
-
 <div class="modal-overlay" id="addonModal">
   <div class="modal">
     <div class="modal-header">
@@ -323,7 +299,6 @@
     </div>
   </div>
 </div>
-
 <div class="modal-overlay" id="productModal">
   <div class="modal">
     <div class="modal-header">
@@ -356,7 +331,6 @@
     </div>
   </div>
 </div>
-
 <div class="modal-overlay" id="addonEditorModal">
   <div class="modal">
     <div class="modal-header">
@@ -377,7 +351,6 @@
     </div>
   </div>
 </div>
-
 <div class="modal-overlay" id="categoryModal">
   <div class="modal">
     <div class="modal-header">
@@ -397,7 +370,6 @@
     </div>
   </div>
 </div>
-
 <div class="modal-overlay" id="confirmModal">
   <div class="modal">
     <div class="modal-header"><h2 data-i18n="payment_complete">Payment Complete</h2></div>
@@ -426,7 +398,6 @@
     </div>
   </div>
 </div>
-
 <div class="modal-overlay" id="oldDayModal">
   <div class="modal">
     <div class="modal-header"><h2 data-i18n="prev_day_detected">Previous Day Detected</h2></div>
@@ -440,14 +411,224 @@
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
+<!-- Live customer orders badge + panel (from QR menu) -->
+<div id="liveOrdersBadge" style="display:none;position:fixed;top:70px;right:16px;background:#b54a3a;color:#fff;padding:8px 14px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;z-index:900;box-shadow:0 4px 12px rgba(0,0,0,0.2);" onclick="openLiveOrders()">
+  🔔 <span id="liveOrdersCount">0</span> <span data-i18n="new_customer_orders">new orders</span>
+</div>
+<div id="liveOrdersModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:950;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;width:100%;max-width:560px;max-height:85vh;border-radius:14px;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="padding:14px 18px;border-bottom:1px solid #e8dfd0;display:flex;justify-content:space-between;align-items:center;">
+      <h2 style="font-size:17px;" data-i18n="customer_orders">Customer Orders</h2>
+      <button onclick="closeLiveOrders()" style="background:#f3ede3;width:34px;height:34px;border-radius:17px;font-size:20px;">×</button>
+    </div>
+    <div id="liveOrdersList" style="padding:12px 18px;overflow-y:auto;flex:1;"></div>
+  </div>
+</div>
+<script type="module">
+// ============================================================
+// FIREBASE SYNC LAYER (added without changing existing features)
+// ============================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, doc, setDoc, onSnapshot, collection, addDoc, updateDoc,
+  query, orderBy, serverTimestamp, where
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyBhCDHCfbiA5UL97szEaHPKRDBbhPlXU9k",
+  authDomain: "changmoocoffee-pos.firebaseapp.com",
+  projectId: "changmoocoffee-pos",
+  storageBucket: "changmoocoffee-pos.firebasestorage.app",
+  messagingSenderId: "277439337705",
+  appId: "1:277439337705:web:af1a6d68b6c924cd704c78",
+  measurementId: "G-PKES3T2R8Q"
+};
+const fbApp = initializeApp(firebaseConfig);
+const fbDb = getFirestore(fbApp);
+// Cloud helpers — attached to window so the non-module script below can call them
+window.cloud = {
+  ready: false,
+  suppressMenuPush: false, // when true, we're applying remote changes; don't echo
+  liveOrders: [],          // customer orders (source: "menu"), pending/making
+  pushMenu: null,          // set after init
+  pushSale: null,
+  markOrderDone: null
+};
+// Init — subscribe to menu + customer orders after loadState() has populated locals
+window.cloudInit = function cloudInit() {
+  const menuRef = doc(fbDb, "config", "menu");
+  // 1) Sync local menu UP to cloud on first load (so remote copy reflects what's on this device)
+  const pushMenu = async () => {
+    if (window.cloud.suppressMenuPush) return;
+    try {
+      await setDoc(menuRef, {
+        products: products || [],
+        addons: addons || [],
+        categories: categories || [],
+        updatedAt: serverTimestamp()
+      });
+    } catch (e) { console.error("pushMenu failed:", e); }
+  };
+  window.cloud.pushMenu = pushMenu;
+  // 2) Listen for menu updates from other devices
+  let firstMenu = true;
+  onSnapshot(menuRef, (snap) => {
+    if (!snap.exists()) {
+      // first ever — seed the cloud with the local menu
+      pushMenu();
+      return;
+    }
+    const data = snap.data();
+    if (firstMenu) {
+      firstMenu = false;
+      // on first load, if cloud has data, adopt it (so iPad sees same menu as computer)
+      if (data.products && Array.isArray(data.products) && data.products.length > 0) {
+        window.cloud.suppressMenuPush = true;
+        products = data.products;
+        addons = data.addons || addons;
+        categories = data.categories || categories;
+        if (!categories.find(c => c.id === activeCat)) activeCat = categories[0]?.id || activeCat;
+        saveMenu(); // update localStorage
+        renderCategories(); renderProducts();
+        if (document.getElementById("menuView").classList.contains("active")) renderMenuEditor();
+        window.cloud.suppressMenuPush = false;
+      } else {
+        // cloud was seeded but empty — push local
+        pushMenu();
+      }
+    } else {
+      // later updates from another device
+      window.cloud.suppressMenuPush = true;
+      products = data.products || products;
+      addons = data.addons || addons;
+      categories = data.categories || categories;
+      if (!categories.find(c => c.id === activeCat)) activeCat = categories[0]?.id || activeCat;
+      saveMenu();
+      renderCategories(); renderProducts();
+      if (document.getElementById("menuView").classList.contains("active")) renderMenuEditor();
+      window.cloud.suppressMenuPush = false;
+      if (typeof toast === "function") toast("✓ Menu updated from another device");
+    }
+    window.cloud.ready = true;
+  }, (err) => { console.error("menu listener:", err); });
+  // 3) Push a sale to cloud (for cross-device reports later)
+  window.cloud.pushSale = async (txn) => {
+    try {
+      await addDoc(collection(fbDb, "sales"), {
+        ...txn,
+        createdAt: serverTimestamp()
+      });
+    } catch (e) { console.error("pushSale failed:", e); }
+  };
+  // 4) Listen for incoming customer orders (from QR menu)
+  const ordersQ = query(collection(fbDb, "orders"), orderBy("createdAt", "desc"));
+  onSnapshot(ordersQ, (snap) => {
+    const arr = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(o => (o.source === "menu") && (o.status === "pending" || o.status === "making"));
+    const prevCount = window.cloud.liveOrders.length;
+    window.cloud.liveOrders = arr;
+    const badge = document.getElementById("liveOrdersBadge");
+    const countEl = document.getElementById("liveOrdersCount");
+    if (arr.length > 0) {
+      badge.style.display = "block";
+      countEl.textContent = arr.length;
+      if (arr.length > prevCount && typeof toast === "function") toast("🔔 New customer order!");
+    } else {
+      badge.style.display = "none";
+    }
+    if (document.getElementById("liveOrdersModal").style.display === "flex") renderLiveOrders();
+  }, (err) => { console.error("orders listener:", err); });
+  // 5) Mark a customer order as done
+  window.cloud.markOrderDone = async (id) => {
+    try { await updateDoc(doc(fbDb, "orders", id), { status: "done" }); }
+    catch (e) { alert("Update failed: " + e.message); }
+  };
+  window.cloud.cancelOrder = async (id) => {
+    try { await updateDoc(doc(fbDb, "orders", id), { status: "cancelled" }); }
+    catch (e) { alert("Cancel failed: " + e.message); }
+  };
+  window.cloud.startMaking = async (id) => {
+    try { await updateDoc(doc(fbDb, "orders", id), { status: "making" }); }
+    catch (e) { alert("Update failed: " + e.message); }
+  };
+};
+// UI: live orders modal
+window.openLiveOrders = function() {
+  document.getElementById("liveOrdersModal").style.display = "flex";
+  renderLiveOrders();
+};
+window.closeLiveOrders = function() {
+  document.getElementById("liveOrdersModal").style.display = "none";
+};
+function renderLiveOrders() {
+  const list = window.cloud.liveOrders || [];
+  const el = document.getElementById("liveOrdersList");
+  if (!list.length) {
+    el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#a08b78;">No pending customer orders</div>`;
+    return;
+  }
+  el.innerHTML = list.map(o => {
+    const tm = o.createdAt?.toDate?.();
+    const tmStr = tm ? tm.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "…";
+    const items = (o.items || []).map(it => {
+      const ax = it.addons?.length ? `<div style="font-size:11px;color:#7a5f47;padding-left:10px;">+ ${it.addons.map(a => a.name).join(", ")}</div>` : "";
+      return `<div>${it.qty}× ${it.name}</div>${ax}`;
+    }).join("");
+    const statusBtn = o.status === "pending"
+      ? `<button class="btn btn-primary" onclick="window.cloud.startMaking('${o.id}')" style="padding:8px 14px;font-size:13px;">Start Making</button>`
+      : `<button class="btn btn-primary" onclick="acceptLiveOrder('${o.id}')" style="padding:8px 14px;font-size:13px;">Mark Done & Record Sale</button>`;
+    return `<div style="background:#f8f4ed;border-radius:8px;padding:12px;margin-bottom:10px;border-left:4px solid ${o.status==='making'?'#3b82f6':'#c08552'};">
+      <div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px;margin-bottom:4px;">
+        <span>${o.table ? "Table " + o.table : "Takeaway"}</span><span>฿${Number(o.total||0).toFixed(0)}</span>
+      </div>
+      <div style="font-size:11px;color:#7a5f47;margin-bottom:8px;">${tmStr} · ${o.status}</div>
+      <div style="font-size:13px;line-height:1.5;margin-bottom:10px;">${items}</div>
+      <div style="display:flex;gap:6px;">
+        ${statusBtn}
+        <button class="btn btn-danger" onclick="window.cloud.cancelOrder('${o.id}')" style="padding:8px 14px;font-size:13px;">Cancel</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+window.renderLiveOrders = renderLiveOrders;
+// When staff accepts a customer order, record it as a sale (so it shows in Sales report)
+// and mark the cloud order as done
+window.acceptLiveOrder = function(id) {
+  const o = window.cloud.liveOrders.find(x => x.id === id);
+  if (!o) return;
+  // synthesize a transaction object matching local `transactions` shape
+  const txn = {
+    id: "t" + Date.now() + Math.random().toString(36).slice(2,6),
+    time: new Date().toISOString(),
+    items: (o.items || []).map(it => ({
+      name: it.name,
+      price: it.price,
+      qty: it.qty,
+      addons: (it.addons || []).map(a => ({ name: a.name, price: a.price })),
+      // try to find category from local products
+      cat: (products.find(p => p.name === it.name) || {}).cat || "uncat"
+    })),
+    total: o.total || 0,
+    payment: "QR Menu",
+    voided: false
+  };
+  transactions.push(txn);
+  saveDay();
+  renderReport();
+  updateWarning && updateWarning();
+  window.cloud.markOrderDone(id);
+  if (typeof toast === "function") toast("✓ Order recorded as sale");
+};
+// Firebase will be kicked off after the main app finishes loadState()
+window.__fbReady = true;
+if (window.__afterLoad) window.__afterLoad();
+</script>
 <script>
 // ========== TRANSLATIONS ==========
 const T = {
   en: {
-    brand: "Coffee Shop POS", tab_register: "Register", tab_sales: "Sales", tab_menu: "Menu",
+    brand: "Changmoo Coffee", tab_register: "Register", tab_sales: "Sales", tab_menu: "Menu",
     current_order: "Current Order", clear: "Clear", tap_to_start: "Tap items to start an order",
     subtotal: "Subtotal", items: "Items", total: "Total",
     cash: "Cash", mobile_pay: "Mobile Pay", modifiers: "Modifiers", remove: "Remove", free: "Free",
@@ -486,6 +667,7 @@ const T = {
     prev_day_msg: "Sales from a previous day were found. Export them before resetting for today?",
     export_and_reset: "Export & Reset", discard: "Discard",
     uncategorized: "Uncategorized",
+    new_customer_orders: "new orders", customer_orders: "Customer Orders",
     sold_out: "Sold Out", toast_sold_out: "Item is sold out", mark_sold_out: "Mark sold out", mark_available: "Mark available",
     tab_orders: "Orders", ongoing_orders: "Ongoing Orders", no_ongoing: "No orders in progress",
     order_num: "Order", mark_ready: "Mark Ready", receipt: "Receipt", print_receipt: "Print",
@@ -493,7 +675,7 @@ const T = {
     ongoing_count: "orders in progress"
   },
   th: {
-    brand: "ร้านกาแฟ POS", tab_register: "ขาย", tab_sales: "ยอดขาย", tab_menu: "เมนู",
+    brand: "ร้านกาแฟของช่างหมู", tab_register: "ขาย", tab_sales: "ยอดขาย", tab_menu: "เมนู",
     current_order: "ออเดอร์ปัจจุบัน", clear: "ล้าง", tap_to_start: "แตะสินค้าเพื่อเริ่มออเดอร์",
     subtotal: "ยอดรวมย่อย", items: "จำนวน", total: "ทั้งหมด",
     cash: "เงินสด", mobile_pay: "จ่ายผ่านมือถือ", modifiers: "เพิ่มเติม", remove: "ลบ", free: "ฟรี",
@@ -532,6 +714,7 @@ const T = {
     prev_day_msg: "พบยอดขายจากวันก่อน ส่งออกก่อนเริ่มวันใหม่?",
     export_and_reset: "ส่งออกและรีเซ็ต", discard: "ละทิ้ง",
     uncategorized: "ไม่มีหมวดหมู่",
+    new_customer_orders: "ออเดอร์ใหม่", customer_orders: "ออเดอร์จากลูกค้า",
     sold_out: "หมด", toast_sold_out: "สินค้าหมดแล้ว", mark_sold_out: "ทำเครื่องหมายว่าหมด", mark_available: "ทำเครื่องหมายว่ามี",
     tab_orders: "คำสั่งซื้อ", ongoing_orders: "คำสั่งซื้อที่กำลังทำ", no_ongoing: "ไม่มีออเดอร์ที่กำลังทำ",
     order_num: "ออเดอร์", mark_ready: "เสร็จแล้ว", receipt: "ใบเสร็จ", print_receipt: "พิมพ์",
@@ -539,7 +722,7 @@ const T = {
     ongoing_count: "ออเดอร์ที่กำลังทำ"
   },
   zh: {
-    brand: "咖啡店 POS", tab_register: "收银", tab_sales: "销售", tab_menu: "菜单",
+    brand: "Changmoo Coffee", tab_register: "收银", tab_sales: "销售", tab_menu: "菜单",
     current_order: "当前订单", clear: "清除", tap_to_start: "点击商品开始下单",
     subtotal: "小计", items: "件数", total: "合计",
     cash: "现金", mobile_pay: "移动支付", modifiers: "附加项", remove: "移除", free: "免费",
@@ -578,6 +761,7 @@ const T = {
     prev_day_msg: "发现上一天的销售记录。重置今日前导出？",
     export_and_reset: "导出并重置", discard: "丢弃",
     uncategorized: "未分类",
+    new_customer_orders: "新订单", customer_orders: "顾客订单",
     sold_out: "售罄", toast_sold_out: "商品已售罄", mark_sold_out: "标记为售罄", mark_available: "标记为有货",
     tab_orders: "订单", ongoing_orders: "进行中订单", no_ongoing: "暂无进行中订单",
     order_num: "订单", mark_ready: "已完成", receipt: "收据", print_receipt: "打印",
@@ -588,7 +772,6 @@ const T = {
 let lang = "en";
 const t = k => (T[lang] && T[lang][k]) || T.en[k] || k;
 const getName = obj => obj ? (obj["name_" + lang] || obj.name_en || obj.name_th || obj.name_zh || obj.name || "") : "";
-
 // ========== DEFAULT DATA ==========
 const DEFAULT_CATEGORIES = [
   { id: "c1", name_en: "Espresso", name_th: "เอสเพรสโซ่", name_zh: "浓缩咖啡" },
@@ -635,7 +818,6 @@ const DEFAULT_ADDONS = [
   { id: "a9",  name_en: "Whipped Cream",  name_th: "วิปครีม",             name_zh: "鲜奶油",     price: 10 },
   { id: "a10", name_en: "Extra Hot",      name_th: "ร้อนพิเศษ",           name_zh: "加热",       price: 0 }
 ];
-
 // ========== STATE ==========
 let categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
 let products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
@@ -646,17 +828,15 @@ let activeCat = "c1";
 let editingLineId = null, editingProductId = null, editingAddonId = null, editingCategoryId = null;
 let prodImageData = null;
 let pendingOldDay = null;
-
 function dateKey(d) { return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
 let currentDateKey = dateKey(new Date());
-
 // ========== STORAGE ==========
 const KEY_MENU = "coffee_pos_menu_v2";
 const KEY_DAY  = "coffee_pos_day_v2";
 const KEY_LANG = "coffee_pos_lang_v2";
-
 function saveMenu() {
   try { localStorage.setItem(KEY_MENU, JSON.stringify({ products, addons, categories })); } catch(e) { console.error(e); }
+  // push to Firebase for cross-device sync
   if (window.cloud && window.cloud.pushMenu) window.cloud.pushMenu();
 }
 function saveDay() {
@@ -666,7 +846,6 @@ function saveDay() {
   }
 }
 function saveLang() { try { localStorage.setItem(KEY_LANG, lang); } catch(e) {} }
-
 function loadState() {
   try {
     const menuRaw = localStorage.getItem(KEY_MENU);
@@ -694,7 +873,6 @@ function loadState() {
     if (categories.length > 0) activeCat = categories[0].id;
   } catch(e) { console.error("Load error", e); }
 }
-
 // ========== HELPERS ==========
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
@@ -706,7 +884,6 @@ function toast(msg) {
   clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), 2000);
 }
 function updateWarning() { $("#warningBar").style.display = transactions.length > 0 ? "block" : "none"; }
-
 // ========== IMAGE RESIZING ==========
 function resizeImage(file, maxSize, quality, callback) {
   const reader = new FileReader();
@@ -729,7 +906,6 @@ function resizeImage(file, maxSize, quality, callback) {
   };
   reader.readAsDataURL(file);
 }
-
 // ========== LANGUAGE ==========
 function setLang(newLang) {
   lang = newLang;
@@ -745,7 +921,6 @@ function setLang(newLang) {
   updateOrdersBadge();
 }
 $$(".lang-btn").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
-
 // ========== NAV ==========
 $$(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
@@ -758,7 +933,6 @@ $$(".tab").forEach(tab => {
     if (tab.dataset.view === "ordersView") renderOrders();
   });
 });
-
 // ========== CLOCK + MIDNIGHT RESET ==========
 function tickClock() {
   const d = new Date();
@@ -777,7 +951,6 @@ function tickClock() {
   }
 }
 setInterval(tickClock, 15000); tickClock();
-
 // ========== MENU RENDER ==========
 function renderCategories() {
   $("#cats").innerHTML = categories.map(c =>
@@ -802,7 +975,6 @@ function renderProducts() {
   }).join("");
   $$(".product").forEach(b => b.addEventListener("click", () => addToCart(b.dataset.id)));
 }
-
 // ========== CART ==========
 function addToCart(productId) {
   const p = products.find(x => x.id === productId);
@@ -821,17 +993,22 @@ function removeLine(lineId) { cart = cart.filter(i => i.lineId !== lineId); rend
 function lineTotal(item) { return (item.price + item.addons.reduce((s,a) => s+a.price, 0)) * item.qty; }
 function cartTotal() { return cart.reduce((s, i) => s + lineTotal(i), 0); }
 function cartCount() { return cart.reduce((s, i) => s + i.qty, 0); }
-
 function renderCart() {
   const el = $("#cartItems");
   if (cart.length === 0) {
     el.innerHTML = `<div class="cart-empty">${t("tap_to_start")}</div>`;
   } else {
     el.innerHTML = cart.map(i => {
-      const aText = i.addons.length > 0 ? i.addons.map(a => `+ ${escapeHtml(a.name)}${a.price > 0 ? " (" + fmt(a.price) + ")" : ""}`).join(", ") : "";
+      const p = products.find(x => x.id === i.productId);
+      const itemName = p ? getName(p) : i.name;
+      const aText = i.addons.length > 0 ? i.addons.map(a => {
+        const ad = addons.find(x => x.id === a.id);
+        const aname = ad ? getName(ad) : a.name;
+        return `+ ${escapeHtml(aname)}${a.price > 0 ? " (" + fmt(a.price) + ")" : ""}`;
+      }).join(", ") : "";
       return `<div class="cart-item">
         <div class="cart-item-top">
-          <div class="cart-item-name">${escapeHtml(i.name)}</div>
+          <div class="cart-item-name">${escapeHtml(itemName)}</div>
           <div class="cart-item-price">${fmt(lineTotal(i))}</div>
         </div>
         ${aText ? `<div class="cart-item-addons">${aText}</div>` : ""}
@@ -852,7 +1029,6 @@ function renderCart() {
   $("#btnCash").disabled = cart.length === 0;
   $("#btnMobile").disabled = cart.length === 0;
 }
-
 // ========== ADD-ON MODAL ==========
 function openAddonModal(lineId) {
   editingLineId = lineId;
@@ -878,7 +1054,6 @@ function saveAddons() {
   it.addons = addons.filter(a => sel.includes(a.id)).map(a => ({ id: a.id, name: getName(a), price: a.price }));
   closeAddonModal(); renderCart();
 }
-
 // ========== PAYMENT ==========
 function nextOrderNumber() {
   const today = dateKey(new Date());
@@ -891,7 +1066,7 @@ function payWith(method) {
   const txn = {
     id: uid(), time: new Date().toISOString(),
     orderNumber: nextOrderNumber(),
-    items: cart.map(i => ({ name: i.name, cat: i.cat, qty: i.qty, price: i.price, addons: i.addons.map(a => ({ name: a.name, price: a.price })), lineTotal: lineTotal(i) })),
+    items: cart.map(i => ({ productId: i.productId, name: i.name, cat: i.cat, qty: i.qty, price: i.price, addons: i.addons.map(a => ({ id: a.id, name: a.name, price: a.price })), lineTotal: lineTotal(i) })),
     total, payment: method, status: "preparing"
   };
   transactions.push(txn);
@@ -904,6 +1079,14 @@ function payWith(method) {
 function closeConfirm() { $("#confirmModal").classList.remove("active"); }
 
 // ========== RECEIPT ==========
+function resolveItemName(i) {
+  if (i.productId) { const p = products.find(x => x.id === i.productId); if (p) return getName(p); }
+  return i.name || "";
+}
+function resolveAddonName(a) {
+  if (a.id) { const ad = addons.find(x => x.id === a.id); if (ad) return getName(ad); }
+  return a.name || "";
+}
 function buildReceiptHtml(tx) {
   const d = new Date(tx.time);
   const locale = lang === "th" ? "th-TH" : (lang === "zh" ? "zh-CN" : undefined);
@@ -911,9 +1094,10 @@ function buildReceiptHtml(tx) {
   const timeStr = d.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
   const payLabel = tx.payment === "Cash" ? t("cash") : t("mobile_pay");
   const lines = tx.items.map(i => {
-    const itemLine = `<div class="r-line"><span>${i.qty}× ${escapeHtml(i.name)}</span><span>${fmt(i.lineTotal)}</span></div>`;
-    const addonLines = i.addons.map(a => `<div class="r-addon">+ ${escapeHtml(a.name)}${a.price > 0 ? " (" + fmt(a.price) + ")" : ""}</div>`).join("");
-    return itemLine + addonLines;
+    const nm = resolveItemName(i);
+    const main = `<div class="r-line"><span>${i.qty}× ${escapeHtml(nm)}</span><span>${fmt(i.lineTotal)}</span></div>`;
+    const adLines = (i.addons || []).map(a => `<div class="r-addon">+ ${escapeHtml(resolveAddonName(a))}${a.price > 0 ? " (" + fmt(a.price) + ")" : ""}</div>`).join("");
+    return main + adLines;
   }).join("");
   return `<div class="receipt">
     <div class="r-head">
@@ -921,38 +1105,25 @@ function buildReceiptHtml(tx) {
       <div class="r-sub">${dateStr} — ${timeStr}</div>
       <div class="r-sub"><b>${t("order_num")} #${tx.orderNumber || "-"}</b></div>
     </div>
-    <div class="r-hr"></div>
-    ${lines}
-    <div class="r-hr"></div>
+    <div class="r-hr"></div>${lines}<div class="r-hr"></div>
     <div class="r-line r-total"><span>${t("total")}</span><span>${fmt(tx.total)}</span></div>
     <div class="r-line"><span>${t("payment")}</span><span>${payLabel}</span></div>
     <div class="r-foot">${t("thank_you")}</div>
   </div>`;
 }
-let __lastReceiptHtml = "";
-function printReceipt() {
-  const html = $("#receiptBox").innerHTML;
-  __lastReceiptHtml = html;
-  printReceiptHtml(html);
-}
-function printReceiptFromReprint() {
-  const html = $("#receiptBoxReprint").innerHTML;
-  printReceiptHtml(html);
-}
+function printReceipt() { printReceiptHtml($("#receiptBox").innerHTML); }
+function printReceiptFromReprint() { printReceiptHtml($("#receiptBoxReprint").innerHTML); }
 function printReceiptHtml(html) {
   const w = window.open("", "_blank");
   w.document.write(`<html><head><title>Receipt</title>
-    <style>
-      body{font-family:ui-monospace,Menlo,Consolas,monospace;padding:16px;max-width:320px;margin:auto;}
-      .receipt{border:none;padding:0;}
-      .r-head{text-align:center;margin-bottom:8px;}
-      .r-shop{font-size:16px;font-weight:700;}
-      .r-sub{font-size:11px;color:#555;}
-      .r-hr{border-top:1px dashed #000;margin:8px 0;}
-      .r-line{display:flex;justify-content:space-between;font-size:13px;}
-      .r-addon{font-size:11px;color:#555;padding-left:10px;}
-      .r-total{font-weight:700;font-size:15px;margin-top:4px;}
-      .r-foot{text-align:center;margin-top:8px;font-size:11px;}
+    <style>body{font-family:ui-monospace,Menlo,Consolas,monospace;padding:16px;max-width:320px;margin:auto;}
+    .receipt{border:none;padding:0;} .r-head{text-align:center;margin-bottom:8px;}
+    .r-shop{font-size:16px;font-weight:700;} .r-sub{font-size:11px;color:#555;}
+    .r-hr{border-top:1px dashed #000;margin:8px 0;}
+    .r-line{display:flex;justify-content:space-between;font-size:13px;}
+    .r-addon{font-size:11px;color:#555;padding-left:10px;}
+    .r-total{font-weight:700;font-size:15px;margin-top:4px;}
+    .r-foot{text-align:center;margin-top:8px;font-size:11px;}
     </style></head><body>${html}</body></html>`);
   w.document.close(); w.focus(); setTimeout(() => w.print(), 300);
 }
@@ -965,17 +1136,15 @@ function viewReceipt(id) {
 }
 
 // ========== ORDERS (ongoing) ==========
-function ongoingOrders() {
-  return transactions.filter(tx => tx.status === "preparing");
-}
+function ongoingOrders() { return transactions.filter(tx => tx.status === "preparing"); }
 function updateOrdersBadge() {
   const count = ongoingOrders().length;
-  const b = $("#ordersBadge");
+  const b = $("#ordersBadge"); if (!b) return;
   if (count > 0) { b.textContent = count; b.style.display = "inline-block"; }
   else { b.style.display = "none"; }
 }
 function renderOrders() {
-  const list = ongoingOrders().slice().sort((a, b) => new Date(a.time) - new Date(b.time));
+  const list = ongoingOrders().slice().sort((a,b) => new Date(a.time) - new Date(b.time));
   $("#ordersCount").textContent = list.length + " " + t("ongoing_count");
   if (list.length === 0) {
     $("#ordersList").innerHTML = `<div class="no-orders">${t("no_ongoing")}</div>`;
@@ -986,20 +1155,15 @@ function renderOrders() {
     const timeStr = new Date(tx.time).toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
     const payLabel = tx.payment === "Cash" ? t("cash") : t("mobile_pay");
     const lines = tx.items.map(i => {
-      const main = `<div class="order-line"><span><span class="oqty">${i.qty}×</span> ${escapeHtml(i.name)}</span><span>${fmt(i.lineTotal)}</span></div>`;
-      const ad = i.addons && i.addons.length ? `<div class="oaddons">+ ${i.addons.map(a => escapeHtml(a.name)).join(", ")}</div>` : "";
+      const nm = resolveItemName(i);
+      const main = `<div class="order-line"><span><span class="oqty">${i.qty}×</span> ${escapeHtml(nm)}</span><span>${fmt(i.lineTotal)}</span></div>`;
+      const ad = i.addons && i.addons.length ? `<div class="oaddons">+ ${i.addons.map(a => escapeHtml(resolveAddonName(a))).join(", ")}</div>` : "";
       return main + ad;
     }).join("");
     return `<div class="order-card">
-      <div class="order-card-head">
-        <div class="order-num">#${tx.orderNumber || "-"}</div>
-        <div class="order-time">${timeStr}</div>
-      </div>
+      <div class="order-card-head"><div class="order-num">#${tx.orderNumber || "-"}</div><div class="order-time">${timeStr}</div></div>
       <div class="order-lines">${lines}</div>
-      <div class="order-foot">
-        <div class="order-total">${fmt(tx.total)}</div>
-        <div class="order-pay">${payLabel}</div>
-      </div>
+      <div class="order-foot"><div class="order-total">${fmt(tx.total)}</div><div class="order-pay">${payLabel}</div></div>
       <div class="order-actions">
         <button class="btn-ready" onclick="markOrderReady('${tx.id}')">✓ ${t("mark_ready")}</button>
         <button class="btn-receipt" onclick="viewReceipt('${tx.id}')">🧾 ${t("view_receipt")}</button>
@@ -1010,32 +1174,25 @@ function renderOrders() {
 function markOrderReady(id) {
   const tx = transactions.find(t => t.id === id);
   if (!tx) return;
-  tx.status = "done";
-  saveDay();
-  renderOrders();
-  updateOrdersBadge();
+  tx.status = "done"; saveDay(); renderOrders(); updateOrdersBadge();
   toast(t("order_ready_toast"));
 }
-
 // ========== REPORT ==========
 function renderReport() {
   const d = new Date();
   const locale = lang === "th" ? "th-TH" : (lang === "zh" ? "zh-CN" : undefined);
   $("#reportDate").textContent = d.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
   const totalRev = transactions.reduce((s, tx) => s + tx.total, 0);
   const totalItems = transactions.reduce((s, tx) => s + tx.items.reduce((x, i) => x + i.qty, 0), 0);
   const cashRev = transactions.filter(tx => tx.payment === "Cash").reduce((s, tx) => s + tx.total, 0);
   const mobileRev = transactions.filter(tx => tx.payment === "Mobile").reduce((s, tx) => s + tx.total, 0);
   const avgSale = transactions.length > 0 ? totalRev / transactions.length : 0;
-
   $("#summaryGrid").innerHTML = `
     <div class="summary-card"><div class="label">${t("revenue")}</div><div class="value">${fmt(totalRev)}</div><div class="sub">${transactions.length} ${t("transactions")}</div></div>
     <div class="summary-card"><div class="label">${t("items_sold")}</div><div class="value">${totalItems}</div><div class="sub">${t("avg_sale")} ${fmt(avgSale)}</div></div>
     <div class="summary-card"><div class="label">${t("cash")}</div><div class="value">${fmt(cashRev)}</div><div class="sub">${transactions.filter(tx => tx.payment === "Cash").length} ${t("sales_count")}</div></div>
     <div class="summary-card"><div class="label">${t("mobile_pay")}</div><div class="value">${fmt(mobileRev)}</div><div class="sub">${transactions.filter(tx => tx.payment === "Mobile").length} ${t("sales_count")}</div></div>
   `;
-
   // Sales by category
   const byCat = {};
   transactions.forEach(tx => tx.items.forEach(i => {
@@ -1062,7 +1219,6 @@ function renderReport() {
       </div>`;
     }).join("");
   }
-
   // Top products
   const byProduct = {};
   transactions.forEach(tx => tx.items.forEach(i => {
@@ -1077,7 +1233,6 @@ function renderReport() {
       `<div class="top-row"><span>${escapeHtml(n)}</span><span class="qty">${d.qty} × — ${fmt(d.rev)}</span></div>`
     ).join("");
   }
-
   const body = $("#txnBody");
   if (transactions.length === 0) {
     body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#a08b78;padding:20px;">${t("no_transactions")}</td></tr>`;
@@ -1114,7 +1269,6 @@ function resetDay() {
   if ($("#ordersView").classList.contains("active")) renderOrders();
   toast(t("toast_day_reset"));
 }
-
 // ========== CSV EXPORT (accepts optional txn set + date key) ==========
 function buildCSV(txns, dateK) {
   const rows = [["Transaction ID", "Date", "Time", "Item", "Category", "Quantity", "Unit Price", "Add-ons", "Add-on Total", "Line Total", "Payment", "Transaction Total"]];
@@ -1134,7 +1288,6 @@ function buildCSV(txns, dateK) {
   rows.push(["Total Transactions", txns.length]);
   rows.push(["Cash Total", txns.filter(tx => tx.payment === "Cash").reduce((s, tx) => s + tx.total, 0).toFixed(2)]);
   rows.push(["Mobile Pay Total", txns.filter(tx => tx.payment === "Mobile").reduce((s, tx) => s + tx.total, 0).toFixed(2)]);
-
   rows.push([]); rows.push(["SALES BY CATEGORY"]); rows.push(["Category", "Quantity", "Revenue"]);
   const byC = {};
   txns.forEach(tx => tx.items.forEach(i => {
@@ -1146,7 +1299,6 @@ function buildCSV(txns, dateK) {
     const c = categories.find(x => x.id === cid);
     rows.push([c ? (c.name_en || getName(c)) : "Uncategorized", d.qty, d.rev.toFixed(2)]);
   });
-
   rows.push([]); rows.push(["PRODUCT BREAKDOWN"]); rows.push(["Product", "Quantity Sold", "Revenue"]);
   const byP = {};
   txns.forEach(tx => tx.items.forEach(i => {
@@ -1154,7 +1306,6 @@ function buildCSV(txns, dateK) {
     byP[i.name].qty += i.qty; byP[i.name].rev += i.lineTotal;
   }));
   Object.entries(byP).sort((a, b) => b[1].qty - a[1].qty).forEach(([n, d]) => rows.push([n, d.qty, d.rev.toFixed(2)]));
-
   return "\uFEFF" + rows.map(r => r.map(c => {
     const s = String(c ?? "");
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
@@ -1173,7 +1324,6 @@ function exportCSV(silent) {
   downloadCSV(buildCSV(transactions, currentDateKey), currentDateKey);
   if (!silent) toast(t("toast_csv_exported"));
 }
-
 // ========== PRINT ==========
 function printReport() {
   if (transactions.length === 0) { toast(t("toast_no_sales_print")); return; }
@@ -1217,7 +1367,6 @@ function printReport() {
   </table></body></html>`);
   w.document.close(); w.focus(); setTimeout(() => w.print(), 300);
 }
-
 // ========== AVAILABILITY TOGGLE ==========
 function toggleAvailable(id) {
   const p = products.find(x => x.id === id);
@@ -1251,21 +1400,18 @@ function renderMenuEditor() {
           }).join("")}
       </div>
     </div>`).join("");
-
   $("#addonEditor").innerHTML = addons.map(a => `<div class="editor-item">
       <div class="ename">${escapeHtml(getName(a))}</div>
       <div class="eprice">${a.price > 0 ? "+" + fmt(a.price) : t("free")}</div>
       <button class="icon-btn" onclick="openAddonEditor('${a.id}')">✎</button>
       <button class="icon-btn del" onclick="deleteAddon('${a.id}')">🗑</button>
     </div>`).join("");
-
   $("#catEditor").innerHTML = categories.map(c => `<div class="editor-item">
       <div class="ename">${escapeHtml(getName(c))}</div>
       <button class="icon-btn" onclick="openCategoryEditor('${c.id}')">✎</button>
       <button class="icon-btn del" onclick="deleteCategory('${c.id}')">🗑</button>
     </div>`).join("");
 }
-
 // ---- Product editor ----
 function showProdImagePreview() {
   const wrap = $("#prodImagePreview");
@@ -1281,7 +1427,6 @@ $("#prodImageInput").addEventListener("change", e => {
   resizeImage(file, 240, 0.82, dataUrl => { prodImageData = dataUrl; showProdImagePreview(); });
   e.target.value = "";
 });
-
 function openProductEditor(id) {
   editingProductId = id || null;
   $("#productModalTitle").textContent = id ? t("edit_product") : t("add_product");
@@ -1329,7 +1474,6 @@ function deleteProduct(id) {
   products = products.filter(p => p.id !== id);
   saveMenu(); renderMenuEditor(); renderProducts();
 }
-
 // ---- Addon editor ----
 function openAddonEditor(id) {
   editingAddonId = id || null;
@@ -1369,7 +1513,6 @@ function deleteAddon(id) {
   if (!confirm(t("confirm_del_modifier"))) return;
   addons = addons.filter(a => a.id !== id); saveMenu(); renderMenuEditor();
 }
-
 // ---- Category editor ----
 function openCategoryEditor(id) {
   editingCategoryId = id || null;
@@ -1411,7 +1554,6 @@ function deleteCategory(id) {
   if (activeCat === id) activeCat = categories[0] ? categories[0].id : "";
   saveMenu(); renderMenuEditor(); renderCategories(); renderProducts();
 }
-
 // ========== OLD DAY PROMPT ==========
 function showOldDayPrompt() {
   if (!pendingOldDay || !pendingOldDay.transactions || pendingOldDay.transactions.length === 0) return;
@@ -1441,24 +1583,9 @@ function oldDayDiscard() {
   updateWarning();
   if ($("#reportView").classList.contains("active")) renderReport();
 }
-
 window.addEventListener("beforeunload", (e) => {
   // Data is saved in localStorage continuously, so no prompt needed.
 });
-
-// ========== CLOUD BRIDGE (lexical bindings → window) ==========
-window.__getMenu = () => ({ products, addons, categories });
-window.__setMenu = (m) => {
-  if (Array.isArray(m.products))   products   = m.products;
-  if (Array.isArray(m.addons))     addons     = m.addons;
-  if (Array.isArray(m.categories) && m.categories.length) categories = m.categories;
-  try { localStorage.setItem(KEY_MENU, JSON.stringify({ products, addons, categories })); } catch(e) {}
-  if (typeof renderCategories === "function") renderCategories();
-  if (typeof renderProducts   === "function") renderProducts();
-  if ($("#menuView").classList.contains("active") && typeof renderMenuEditor === "function") renderMenuEditor();
-};
-window.__toast = (msg) => toast(msg);
-
 // ========== INIT ==========
 loadState();
 setLang(lang);
@@ -1466,102 +1593,10 @@ renderCart();
 updateWarning();
 updateOrdersBadge();
 if (pendingOldDay) setTimeout(showOldDayPrompt, 300);
-
+// ========== FIREBASE SYNC INIT ==========
+// Wait until the module script has finished loading Firebase, then start sync
 function __startCloud() { if (window.cloudInit) window.cloudInit(); }
 if (window.__fbReady) __startCloud(); else window.__afterLoad = __startCloud;
 </script>
-
-<!-- ========== FIREBASE SYNC LAYER ========== -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimestamp }
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBhCDHCfbiA5UL97szEaHPKRDBbhPlXU9k",
-    authDomain: "changmoocoffee-pos.firebaseapp.com",
-    projectId: "changmoocoffee-pos",
-    storageBucket: "changmoocoffee-pos.firebasestorage.app",
-    messagingSenderId: "277439337705",
-    appId: "1:277439337705:web:af1a6d68b6c924cd704c78",
-    measurementId: "G-PKES3T2R8Q"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
-
-  let suppressMenuPush = false;
-  let menuLoaded = false;
-
-  // Push the current menu (products + addons + categories) to the cloud
-  async function pushMenu() {
-    if (suppressMenuPush) return;
-    try {
-      const m = (typeof window.__getMenu === "function") ? window.__getMenu() : { products: [], addons: [], categories: [] };
-      await setDoc(doc(db, "config", "menu"), {
-        products:   m.products   || [],
-        addons:     m.addons     || [],
-        categories: m.categories || [],
-        updatedAt:  serverTimestamp()
-      });
-    } catch (e) { console.error("pushMenu", e); }
-  }
-
-  // Push a completed sale
-  async function pushSale(txn) {
-    try {
-      await addDoc(collection(db, "sales"), { ...txn, createdAt: serverTimestamp() });
-    } catch (e) { console.error("pushSale", e); }
-  }
-
-  // Listen for menu updates from other devices
-  function listenMenu() {
-    onSnapshot(doc(db, "config", "menu"), snap => {
-      if (!snap.exists()) {
-        // First-time setup: push the local menu up
-        if (menuLoaded === false) { menuLoaded = true; pushMenu(); }
-        return;
-      }
-      const data = snap.data();
-      if (!data) return;
-      suppressMenuPush = true;
-      if (typeof window.__setMenu === "function") {
-        window.__setMenu({
-          products:   data.products,
-          addons:     data.addons,
-          categories: data.categories
-        });
-      }
-      menuLoaded = true;
-      setTimeout(() => { suppressMenuPush = false; }, 200);
-    }, err => console.error("listenMenu", err));
-  }
-
-  // Listen for orders sent from the customer-facing QR menu
-  function listenOrders() {
-    onSnapshot(collection(db, "orders"), snap => {
-      snap.docChanges().forEach(ch => {
-        if (ch.type !== "added") return;
-        const o = ch.doc.data();
-        if (!o) return;
-        if (typeof window.__toast === "function") {
-          window.__toast("🔔 New customer order: ฿" + (o.total || 0));
-        }
-      });
-    }, err => console.error("listenOrders", err));
-  }
-
-  // Expose API for the non-module script
-  window.cloud = { pushMenu, pushSale };
-
-  window.cloudInit = function () {
-    listenMenu();
-    listenOrders();
-  };
-
-  window.__fbReady = true;
-  if (typeof window.__afterLoad === "function") window.__afterLoad();
-</script>
-
 </body>
 </html>
