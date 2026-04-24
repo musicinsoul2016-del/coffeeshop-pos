@@ -168,6 +168,38 @@
     font-size: 14px; flex-shrink: 0; border: 1px solid #4a7c59; color: #4a7c59;
   }
   .toggle-avail.off { border-color: #b54a3a; color: #b54a3a; background: #fff4f1; }
+
+  /* Tab badge (for Orders count) */
+  .tab-badge { display: inline-block; background: #b54a3a; color: #fff; font-size: 11px; font-weight: 700; border-radius: 10px; padding: 1px 7px; margin-left: 4px; min-width: 18px; text-align: center; }
+
+  /* Order cards */
+  .order-card { background: #fff; border-radius: 12px; border: 1px solid #e8dfd0; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .order-card.ready { opacity: 0.55; }
+  .order-card-head { display: flex; justify-content: space-between; align-items: center; }
+  .order-num { font-size: 22px; font-weight: 700; color: #3e2a1f; }
+  .order-time { font-size: 12px; color: #7a5f47; }
+  .order-lines { font-size: 14px; line-height: 1.5; color: #3e2a1f; border-top: 1px dashed #e8dfd0; border-bottom: 1px dashed #e8dfd0; padding: 8px 0; }
+  .order-line { display: flex; justify-content: space-between; gap: 8px; }
+  .order-line .oqty { color: #7a5f47; font-weight: 600; min-width: 22px; }
+  .order-line .oaddons { font-size: 12px; color: #7a5f47; padding-left: 22px; }
+  .order-foot { display: flex; justify-content: space-between; align-items: center; }
+  .order-total { font-weight: 700; font-size: 16px; }
+  .order-pay { font-size: 12px; color: #7a5f47; }
+  .order-actions { display: flex; gap: 6px; }
+  .btn-ready { background: #4a7c59; color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; flex: 1; }
+  .btn-receipt { background: #fff; color: #3e2a1f; border: 1px solid #c08552; padding: 10px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+  .no-orders { grid-column: 1/-1; text-align: center; color: #a08b78; padding: 60px 20px; font-size: 15px; }
+
+  /* Receipt */
+  .receipt { font-family: ui-monospace, Menlo, Consolas, monospace; background: #fffdf7; border: 1px dashed #c08552; border-radius: 8px; padding: 16px; margin: 6px 0; color: #2b2018; }
+  .receipt .r-head { text-align: center; margin-bottom: 8px; }
+  .receipt .r-shop { font-size: 16px; font-weight: 700; }
+  .receipt .r-sub { font-size: 11px; color: #7a5f47; }
+  .receipt .r-hr { border-top: 1px dashed #c08552; margin: 8px 0; }
+  .receipt .r-line { display: flex; justify-content: space-between; font-size: 13px; }
+  .receipt .r-addon { font-size: 11px; color: #7a5f47; padding-left: 10px; }
+  .receipt .r-total { font-weight: 700; font-size: 15px; margin-top: 4px; }
+  .receipt .r-foot { text-align: center; margin-top: 8px; font-size: 11px; color: #7a5f47; }
 </style>
 </head>
 <body>
@@ -176,6 +208,7 @@
   <div class="brand">☕ <span data-i18n="brand">Coffee Shop POS</span></div>
   <div class="tabs">
     <button class="tab active" data-view="posView" data-i18n="tab_register">Register</button>
+    <button class="tab" data-view="ordersView" data-i18n="tab_orders">Orders <span id="ordersBadge" class="tab-badge" style="display:none;">0</span></button>
     <button class="tab" data-view="reportView" data-i18n="tab_sales">Sales</button>
     <button class="tab" data-view="menuView" data-i18n="tab_menu">Menu</button>
   </div>
@@ -244,6 +277,16 @@
       </table>
     </div>
   </div>
+</div>
+
+<div id="ordersView" class="view" style="flex-direction:column;padding:20px;overflow-y:auto;">
+  <div class="report-header">
+    <div>
+      <h1 data-i18n="ongoing_orders">Ongoing Orders</h1>
+      <div id="ordersCount" style="font-size:13px;color:#7a5f47;margin-top:4px;"></div>
+    </div>
+  </div>
+  <div id="ordersList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;"></div>
 </div>
 
 <div id="menuView" class="view">
@@ -359,14 +402,27 @@
   <div class="modal">
     <div class="modal-header"><h2 data-i18n="payment_complete">Payment Complete</h2></div>
     <div class="modal-body">
-      <div class="confirm-msg">
-        <div data-i18n="sale_recorded">Sale recorded successfully</div>
-        <div class="big" id="confirmAmount">฿0</div>
-        <div id="confirmMethod" style="color:#7a5f47;"></div>
-      </div>
+      <div id="receiptBox"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-primary" onclick="closeConfirm()" style="width:100%;padding:14px;" data-i18n="new_order">New Order</button>
+      <button class="btn btn-secondary" onclick="printReceipt()" data-i18n="print_receipt">Print</button>
+      <button class="btn btn-primary" onclick="closeConfirm()" style="flex:1;padding:14px;" data-i18n="new_order">New Order</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="receiptModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 data-i18n="receipt">Receipt</h2>
+      <button class="modal-close" onclick="closeReceiptModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="receiptBoxReprint"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="printReceiptFromReprint()" data-i18n="print_receipt">Print</button>
+      <button class="btn btn-primary" onclick="closeReceiptModal()" data-i18n="done">Done</button>
     </div>
   </div>
 </div>
@@ -430,7 +486,11 @@ const T = {
     prev_day_msg: "Sales from a previous day were found. Export them before resetting for today?",
     export_and_reset: "Export & Reset", discard: "Discard",
     uncategorized: "Uncategorized",
-    sold_out: "Sold Out", toast_sold_out: "Item is sold out", mark_sold_out: "Mark sold out", mark_available: "Mark available"
+    sold_out: "Sold Out", toast_sold_out: "Item is sold out", mark_sold_out: "Mark sold out", mark_available: "Mark available",
+    tab_orders: "Orders", ongoing_orders: "Ongoing Orders", no_ongoing: "No orders in progress",
+    order_num: "Order", mark_ready: "Mark Ready", receipt: "Receipt", print_receipt: "Print",
+    view_receipt: "Receipt", order_ready_toast: "Order marked ready", shop_name: "Chang Moo Coffee",
+    ongoing_count: "orders in progress"
   },
   th: {
     brand: "ร้านกาแฟ POS", tab_register: "ขาย", tab_sales: "ยอดขาย", tab_menu: "เมนู",
@@ -472,7 +532,11 @@ const T = {
     prev_day_msg: "พบยอดขายจากวันก่อน ส่งออกก่อนเริ่มวันใหม่?",
     export_and_reset: "ส่งออกและรีเซ็ต", discard: "ละทิ้ง",
     uncategorized: "ไม่มีหมวดหมู่",
-    sold_out: "หมด", toast_sold_out: "สินค้าหมดแล้ว", mark_sold_out: "ทำเครื่องหมายว่าหมด", mark_available: "ทำเครื่องหมายว่ามี"
+    sold_out: "หมด", toast_sold_out: "สินค้าหมดแล้ว", mark_sold_out: "ทำเครื่องหมายว่าหมด", mark_available: "ทำเครื่องหมายว่ามี",
+    tab_orders: "คำสั่งซื้อ", ongoing_orders: "คำสั่งซื้อที่กำลังทำ", no_ongoing: "ไม่มีออเดอร์ที่กำลังทำ",
+    order_num: "ออเดอร์", mark_ready: "เสร็จแล้ว", receipt: "ใบเสร็จ", print_receipt: "พิมพ์",
+    view_receipt: "ใบเสร็จ", order_ready_toast: "ทำเครื่องหมายเสร็จแล้ว", shop_name: "ร้านกาแฟของช่างหมู",
+    ongoing_count: "ออเดอร์ที่กำลังทำ"
   },
   zh: {
     brand: "咖啡店 POS", tab_register: "收银", tab_sales: "销售", tab_menu: "菜单",
@@ -514,7 +578,11 @@ const T = {
     prev_day_msg: "发现上一天的销售记录。重置今日前导出？",
     export_and_reset: "导出并重置", discard: "丢弃",
     uncategorized: "未分类",
-    sold_out: "售罄", toast_sold_out: "商品已售罄", mark_sold_out: "标记为售罄", mark_available: "标记为有货"
+    sold_out: "售罄", toast_sold_out: "商品已售罄", mark_sold_out: "标记为售罄", mark_available: "标记为有货",
+    tab_orders: "订单", ongoing_orders: "进行中订单", no_ongoing: "暂无进行中订单",
+    order_num: "订单", mark_ready: "已完成", receipt: "收据", print_receipt: "打印",
+    view_receipt: "收据", order_ready_toast: "订单已标记完成", shop_name: "昌牧咖啡",
+    ongoing_count: "个进行中订单"
   }
 };
 let lang = "en";
@@ -673,6 +741,8 @@ function setLang(newLang) {
   renderCategories(); renderProducts(); renderCart();
   if ($("#reportView").classList.contains("active")) renderReport();
   if ($("#menuView").classList.contains("active")) renderMenuEditor();
+  if ($("#ordersView").classList.contains("active")) renderOrders();
+  updateOrdersBadge();
 }
 $$(".lang-btn").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
 
@@ -685,6 +755,7 @@ $$(".tab").forEach(tab => {
     $("#" + tab.dataset.view).classList.add("active");
     if (tab.dataset.view === "reportView") renderReport();
     if (tab.dataset.view === "menuView") renderMenuEditor();
+    if (tab.dataset.view === "ordersView") renderOrders();
   });
 });
 
@@ -809,22 +880,142 @@ function saveAddons() {
 }
 
 // ========== PAYMENT ==========
+function nextOrderNumber() {
+  const today = dateKey(new Date());
+  const todays = transactions.filter(tx => (tx.time || "").slice(0,10) === today);
+  return todays.length + 1;
+}
 function payWith(method) {
   if (cart.length === 0) return;
   const total = cartTotal();
   const txn = {
     id: uid(), time: new Date().toISOString(),
+    orderNumber: nextOrderNumber(),
     items: cart.map(i => ({ name: i.name, cat: i.cat, qty: i.qty, price: i.price, addons: i.addons.map(a => ({ name: a.name, price: a.price })), lineTotal: lineTotal(i) })),
-    total, payment: method
+    total, payment: method, status: "preparing"
   };
   transactions.push(txn);
   if (window.cloud && window.cloud.pushSale) window.cloud.pushSale(txn);
   cart = []; renderCart(); updateWarning(); saveDay();
-  $("#confirmAmount").textContent = fmt(total);
-  $("#confirmMethod").textContent = (method === "Cash" ? t("cash") : t("mobile_pay")) + " — " + t("thank_you");
+  $("#receiptBox").innerHTML = buildReceiptHtml(txn);
   $("#confirmModal").classList.add("active");
+  updateOrdersBadge();
 }
 function closeConfirm() { $("#confirmModal").classList.remove("active"); }
+
+// ========== RECEIPT ==========
+function buildReceiptHtml(tx) {
+  const d = new Date(tx.time);
+  const locale = lang === "th" ? "th-TH" : (lang === "zh" ? "zh-CN" : undefined);
+  const dateStr = d.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
+  const timeStr = d.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
+  const payLabel = tx.payment === "Cash" ? t("cash") : t("mobile_pay");
+  const lines = tx.items.map(i => {
+    const itemLine = `<div class="r-line"><span>${i.qty}× ${escapeHtml(i.name)}</span><span>${fmt(i.lineTotal)}</span></div>`;
+    const addonLines = i.addons.map(a => `<div class="r-addon">+ ${escapeHtml(a.name)}${a.price > 0 ? " (" + fmt(a.price) + ")" : ""}</div>`).join("");
+    return itemLine + addonLines;
+  }).join("");
+  return `<div class="receipt">
+    <div class="r-head">
+      <div class="r-shop">☕ ${escapeHtml(t("shop_name"))}</div>
+      <div class="r-sub">${dateStr} — ${timeStr}</div>
+      <div class="r-sub"><b>${t("order_num")} #${tx.orderNumber || "-"}</b></div>
+    </div>
+    <div class="r-hr"></div>
+    ${lines}
+    <div class="r-hr"></div>
+    <div class="r-line r-total"><span>${t("total")}</span><span>${fmt(tx.total)}</span></div>
+    <div class="r-line"><span>${t("payment")}</span><span>${payLabel}</span></div>
+    <div class="r-foot">${t("thank_you")}</div>
+  </div>`;
+}
+let __lastReceiptHtml = "";
+function printReceipt() {
+  const html = $("#receiptBox").innerHTML;
+  __lastReceiptHtml = html;
+  printReceiptHtml(html);
+}
+function printReceiptFromReprint() {
+  const html = $("#receiptBoxReprint").innerHTML;
+  printReceiptHtml(html);
+}
+function printReceiptHtml(html) {
+  const w = window.open("", "_blank");
+  w.document.write(`<html><head><title>Receipt</title>
+    <style>
+      body{font-family:ui-monospace,Menlo,Consolas,monospace;padding:16px;max-width:320px;margin:auto;}
+      .receipt{border:none;padding:0;}
+      .r-head{text-align:center;margin-bottom:8px;}
+      .r-shop{font-size:16px;font-weight:700;}
+      .r-sub{font-size:11px;color:#555;}
+      .r-hr{border-top:1px dashed #000;margin:8px 0;}
+      .r-line{display:flex;justify-content:space-between;font-size:13px;}
+      .r-addon{font-size:11px;color:#555;padding-left:10px;}
+      .r-total{font-weight:700;font-size:15px;margin-top:4px;}
+      .r-foot{text-align:center;margin-top:8px;font-size:11px;}
+    </style></head><body>${html}</body></html>`);
+  w.document.close(); w.focus(); setTimeout(() => w.print(), 300);
+}
+function closeReceiptModal() { $("#receiptModal").classList.remove("active"); }
+function viewReceipt(id) {
+  const tx = transactions.find(t => t.id === id);
+  if (!tx) return;
+  $("#receiptBoxReprint").innerHTML = buildReceiptHtml(tx);
+  $("#receiptModal").classList.add("active");
+}
+
+// ========== ORDERS (ongoing) ==========
+function ongoingOrders() {
+  return transactions.filter(tx => tx.status === "preparing");
+}
+function updateOrdersBadge() {
+  const count = ongoingOrders().length;
+  const b = $("#ordersBadge");
+  if (count > 0) { b.textContent = count; b.style.display = "inline-block"; }
+  else { b.style.display = "none"; }
+}
+function renderOrders() {
+  const list = ongoingOrders().slice().sort((a, b) => new Date(a.time) - new Date(b.time));
+  $("#ordersCount").textContent = list.length + " " + t("ongoing_count");
+  if (list.length === 0) {
+    $("#ordersList").innerHTML = `<div class="no-orders">${t("no_ongoing")}</div>`;
+    return;
+  }
+  $("#ordersList").innerHTML = list.map(tx => {
+    const locale = lang === "th" ? "th-TH" : (lang === "zh" ? "zh-CN" : undefined);
+    const timeStr = new Date(tx.time).toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
+    const payLabel = tx.payment === "Cash" ? t("cash") : t("mobile_pay");
+    const lines = tx.items.map(i => {
+      const main = `<div class="order-line"><span><span class="oqty">${i.qty}×</span> ${escapeHtml(i.name)}</span><span>${fmt(i.lineTotal)}</span></div>`;
+      const ad = i.addons && i.addons.length ? `<div class="oaddons">+ ${i.addons.map(a => escapeHtml(a.name)).join(", ")}</div>` : "";
+      return main + ad;
+    }).join("");
+    return `<div class="order-card">
+      <div class="order-card-head">
+        <div class="order-num">#${tx.orderNumber || "-"}</div>
+        <div class="order-time">${timeStr}</div>
+      </div>
+      <div class="order-lines">${lines}</div>
+      <div class="order-foot">
+        <div class="order-total">${fmt(tx.total)}</div>
+        <div class="order-pay">${payLabel}</div>
+      </div>
+      <div class="order-actions">
+        <button class="btn-ready" onclick="markOrderReady('${tx.id}')">✓ ${t("mark_ready")}</button>
+        <button class="btn-receipt" onclick="viewReceipt('${tx.id}')">🧾 ${t("view_receipt")}</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+function markOrderReady(id) {
+  const tx = transactions.find(t => t.id === id);
+  if (!tx) return;
+  tx.status = "done";
+  saveDay();
+  renderOrders();
+  updateOrdersBadge();
+  toast(t("order_ready_toast"));
+}
 
 // ========== REPORT ==========
 function renderReport() {
@@ -895,12 +1086,16 @@ function renderReport() {
       const tm = new Date(tx.time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       const itemsText = tx.items.map(i => `${i.qty}× ${escapeHtml(i.name)}${i.addons.length > 0 ? " (" + i.addons.map(a => escapeHtml(a.name)).join(", ") + ")" : ""}`).join(", ");
       const payLabel = tx.payment === "Cash" ? t("cash") : t("mobile_pay");
+      const numCell = tx.orderNumber ? `#${tx.orderNumber} · ` : "";
       return `<tr>
-        <td>${tm}</td>
+        <td>${numCell}${tm}</td>
         <td><div class="txn-items">${itemsText}</div></td>
         <td>${payLabel}</td>
         <td style="text-align:right;font-weight:600;">${fmt(tx.total)}</td>
-        <td><button class="void-btn" onclick="voidTxn('${tx.id}')">${t("void")}</button></td>
+        <td>
+          <button class="void-btn" style="color:#3e2a1f;" onclick="viewReceipt('${tx.id}')">🧾</button>
+          <button class="void-btn" onclick="voidTxn('${tx.id}')">${t("void")}</button>
+        </td>
       </tr>`;
     }).join("");
   }
@@ -908,12 +1103,16 @@ function renderReport() {
 function voidTxn(id) {
   if (!confirm(t("confirm_void"))) return;
   transactions = transactions.filter(tx => tx.id !== id);
-  saveDay(); renderReport(); updateWarning(); toast(t("toast_voided"));
+  saveDay(); renderReport(); updateWarning(); updateOrdersBadge();
+  if ($("#ordersView").classList.contains("active")) renderOrders();
+  toast(t("toast_voided"));
 }
 function resetDay() {
   if (transactions.length === 0) { toast(t("toast_no_sales_reset")); return; }
   if (!confirm(t("confirm_reset"))) return;
-  transactions = []; saveDay(); renderReport(); updateWarning(); toast(t("toast_day_reset"));
+  transactions = []; saveDay(); renderReport(); updateWarning(); updateOrdersBadge();
+  if ($("#ordersView").classList.contains("active")) renderOrders();
+  toast(t("toast_day_reset"));
 }
 
 // ========== CSV EXPORT (accepts optional txn set + date key) ==========
@@ -1265,6 +1464,7 @@ loadState();
 setLang(lang);
 renderCart();
 updateWarning();
+updateOrdersBadge();
 if (pendingOldDay) setTimeout(showOldDayPrompt, 300);
 
 function __startCloud() { if (window.cloudInit) window.cloudInit(); }
